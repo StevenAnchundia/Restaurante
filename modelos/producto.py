@@ -1,14 +1,23 @@
 class Producto:
-    def __init__(self, nombre: str, precio: float, cantidad_disponible: int, disponible: bool):
+    """Clase padre que representa un producto del restaurante."""
+
+    def __init__(self, nombre: str, precio: float, disponible: bool):
         self.nombre = nombre
-        self.precio = precio
-        self.cantidad_disponible = cantidad_disponible
+        self.__precio = precio 
         self.disponible = disponible
 
-    def __str__(self):
-        estado = "Sí" if self.disponible else "No"
-        return f"Producto: {self.nombre}, Precio: ${self.precio:.2f}, Stock: {self.cantidad_disponible}, Disponible: {estado}"
+    def obtener_precio(self):
+        return self.__precio
 
-    def actualizar_stock(self, nueva_cantidad: int):
-        self.cantidad_disponible = nueva_cantidad
-        self.disponible = self.cantidad_disponible > 0
+    def cambiar_precio(self, nuevo_precio: float):
+        if nuevo_precio > 0:
+            self.__precio = nuevo_precio
+        else:
+            print("El precio debe ser mayor que cero.")
+
+    def mostrar_informacion(self):
+        estado = "Disponible" if self.disponible else "No disponible"
+
+        print(f"Nombre: {self.nombre}")
+        print(f"Precio: ${self.__precio:.2f}")
+        print(f"Estado: {estado}")
