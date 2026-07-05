@@ -1,28 +1,31 @@
-from modelos.producto import Producto
-from modelos.cliente import Cliente
+from modelos.platillo import Platillo
+from modelos.bebida import Bebida
 from servicios.restaurante import Restaurante
 
-# Creación del restaurante
-restaurante = Restaurante("Sabores del Ecuador")
 
-# Creación de productos
-producto1 = Producto("Seco de pollo", 4.50, 10, True)
-producto2 = Producto("Jugo de naranja", 1.25, 25, True)
+restaurante = Restaurante()
 
-# Creación de clientes
-cliente1 = Cliente("Erick Anchundia", "0923456789", 21, True)
-cliente2 = Cliente("María López", "0912345678", 30, True)
+# Platillos
+platillo1 = Platillo("Hamburguesa", 6.50, True, 850)
+platillo2 = Platillo("Pizza", 12.00, True, 1200)
 
-# Agregar objetos al servicio
-restaurante.agregar_producto(producto1)
-restaurante.agregar_producto(producto2)
-restaurante.agregar_cliente(cliente1)
-restaurante.agregar_cliente(cliente2)
+# Bebidas
+bebida1 = Bebida("Coca-Cola", 2.00, True, 500)
+bebida2 = Bebida("Jugo de Naranja", 3.50, False, 350)
 
-# Mostrar información
-print(f"Restaurante: {restaurante.nombre}")
-print("\nProductos registrados:")
+restaurante.agregar_producto(platillo1)
+restaurante.agregar_producto(platillo2)
+restaurante.agregar_producto(bebida1)
+restaurante.agregar_producto(bebida2)
+
+# Demostración de encapsulación
+print("Precio original:", platillo1.obtener_precio())
+
+platillo1.cambiar_precio(7.25)
+
+print("Nuevo precio:", platillo1.obtener_precio())
+
+print("\n")
+
+# Polimorfismo
 restaurante.mostrar_productos()
-
-print("\nClientes registrados:")
-restaurante.mostrar_clientes()
