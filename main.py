@@ -18,7 +18,7 @@ restaurante.agregar_producto(platillo2)
 restaurante.agregar_producto(bebida1)
 restaurante.agregar_producto(bebida2)
 
-# Demostración de encapsulación
+# Encapsulación
 print("Precio original:", platillo1.obtener_precio())
 
 platillo1.cambiar_precio(7.25)
