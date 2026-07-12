@@ -1,31 +1,89 @@
-from modelos.platillo import Platillo
-from modelos.bebida import Bebida
+from modelos.producto import Producto
+from modelos.cliente import Cliente
 from servicios.restaurante import Restaurante
-
 
 restaurante = Restaurante()
 
-# Platillos
-platillo1 = Platillo("Hamburguesa", 6.50, True, 850)
-platillo2 = Platillo("Pizza", 12.00, True, 1200)
+while True:
 
-# Bebidas
-bebida1 = Bebida("Coca-Cola", 2.00, True, 500)
-bebida2 = Bebida("Jugo de Naranja", 3.50, False, 350)
+    print("\n========================================")
+    print("      SISTEMA DE RESTAURANTE")
+    print("========================================")
+    print("1. Registrar producto")
+    print("2. Listar productos")
+    print("3. Buscar producto")
+    print("----------------------------------------")
+    print("4. Registrar cliente")
+    print("5. Listar clientes")
+    print("6. Buscar cliente")
+    print("----------------------------------------")
+    print("7. Salir")
 
-restaurante.agregar_producto(platillo1)
-restaurante.agregar_producto(platillo2)
-restaurante.agregar_producto(bebida1)
-restaurante.agregar_producto(bebida2)
+    opcion = input("Seleccione una opción: ")
 
-# Encapsulación
-print("Precio original:", platillo1.obtener_precio())
+    if opcion == "1":
 
-platillo1.cambiar_precio(7.25)
+        try:
+            nombre = input("Nombre: ")
+            categoria = input("Categoría: ")
+            precio = float(input("Precio: "))
+            disponible = input("Disponible (s/n): ").lower() == "s"
 
-print("Nuevo precio:", platillo1.obtener_precio())
+            producto = Producto(
+                nombre,
+                categoria,
+                precio,
+                disponible
+            )
 
-print("\n")
+            restaurante.registrar_producto(producto)
 
-# Polimorfismo
-restaurante.mostrar_productos()
+            print("Producto registrado.")
+
+        except ValueError as e:
+            print(e)
+
+    elif opcion == "2":
+
+        restaurante.listar_productos()
+
+    elif opcion == "3":
+
+        nombre = input("Nombre del producto: ")
+
+        restaurante.buscar_producto(nombre)
+
+    elif opcion == "4":
+
+        id_cliente = int(input("ID: "))
+        nombre = input("Nombre: ")
+        correo = input("Correo: ")
+
+        cliente = Cliente(
+            id_cliente,
+            nombre,
+            correo
+        )
+
+        restaurante.registrar_cliente(cliente)
+
+        print("Cliente registrado.")
+
+    elif opcion == "5":
+
+        restaurante.listar_clientes()
+
+    elif opcion == "6":
+
+        id_cliente = int(input("ID del cliente: "))
+
+        restaurante.buscar_cliente(id_cliente)
+
+    elif opcion == "7":
+
+        print("Programa finalizado.")
+        break
+
+    else:
+
+        print("Opción inválida.")
