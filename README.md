@@ -1,28 +1,30 @@
 # Sistema de Gestión de Restaurante
 
-**Estudiante:** Erick Anchundia
+## Estudiante
+
+Erick Steven Anchundia Martínez
 
 ## Descripción
-Este proyecto implementa un sistema básico de gestión de restaurante en Python usando Programacion Orientada a Objetos.
-## Herencia
 
-La clase `Producto` es la clase padre.
+Este proyecto corresponde a la Semana 7 de Programación Orientada a Objetos. El sistema permite registrar, listar y buscar productos y clientes mediante un menú interactivo en consola.
 
-Las clases `Platillo` y `Bebida` heredan sus atributos y métodos utilizando `super()`.
+## Estructura
 
-## Encapsulación
+- modelos/
+  - producto.py
+  - cliente.py
+- servicios/
+  - restaurante.py
+- main.py
 
-El atributo `__precio` se encuentra encapsulado y únicamente puede accederse mediante:
+## Características
 
-- obtener_precio()
-- cambiar_precio()
-
-Además, el método `cambiar_precio()` valida que el nuevo precio sea mayor que cero.
-
-## Polimorfismo
-
-Las clases `Platillo` y `Bebida` sobrescriben el método `mostrar_informacion()`, permitiendo que cada objeto muestre información específica al recorrer la lista de productos.
+- Clase `Producto` implementada con constructor `__init__`.
+- Uso de `@property` y `@setter` para validar nombre, categoría y precio.
+- Clase `Cliente` implementada con `@dataclass`.
+- Clase `Restaurante` encargada de administrar listas de productos y clientes.
+- Menú interactivo para registrar, listar y buscar información.
 
 ## Reflexión
 
-Aplicar herencia permite reutilizar código y reducir duplicidad. La encapsulación protege la información importante de los objetos, mientras que el polimorfismo hace posible utilizar un mismo método con comportamientos diferentes según el tipo de objeto, logrando programas más organizados y fáciles de mantener.
+El uso de `@property` y `@setter` permite controlar y validar los datos antes de almacenarlos en un objeto. El decorador `@dataclass` simplifica la creación de clases que contienen información, mientras que la organización modular facilita el mantenimiento y la comprensión del proyecto.
