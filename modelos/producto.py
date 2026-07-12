@@ -1,23 +1,54 @@
 class Producto:
-    """Clase padre que representa un producto del restaurante."""
+    """Representa un producto del restaurante."""
 
-    def __init__(self, nombre: str, precio: float, disponible: bool):
+    def __init__(self, nombre: str, categoria: str,
+                 precio: float, disponible: bool):
+
         self.nombre = nombre
-        self.__precio = precio 
+        self.categoria = categoria
+        self.precio = precio
         self.disponible = disponible
 
-    def obtener_precio(self):
+    # Nombre
+    @property
+    def nombre(self):
+        return self.__nombre
+
+    @nombre.setter
+    def nombre(self, valor):
+        if valor.strip() == "":
+            raise ValueError("El nombre no puede estar vacío.")
+        self.__nombre = valor
+
+    # Categoría
+    @property
+    def categoria(self):
+        return self.__categoria
+
+    @categoria.setter
+    def categoria(self, valor):
+        if valor.strip() == "":
+            raise ValueError("La categoría no puede estar vacía.")
+        self.__categoria = valor
+
+    # Precio
+    @property
+    def precio(self):
         return self.__precio
 
-    def cambiar_precio(self, nuevo_precio: float):
-        if nuevo_precio > 0:
-            self.__precio = nuevo_precio
-        else:
-            print("El precio debe ser mayor que cero.")
+    @precio.setter
+    def precio(self, valor):
+        if valor <= 0:
+            raise ValueError("El precio debe ser mayor que cero.")
+        self.__precio = valor
 
     def mostrar_informacion(self):
+
         estado = "Disponible" if self.disponible else "No disponible"
 
-        print(f"Nombre: {self.nombre}")
-        print(f"Precio: ${self.__precio:.2f}")
-        print(f"Estado: {estado}")
+        return (
+            f"Nombre: {self.nombre} | "
+            f"Categoría: {self.categoria} | "
+            f"Precio: ${self.precio:.2f} | "
+            f"{estado}"
+        )
