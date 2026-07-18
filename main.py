@@ -1,89 +1,135 @@
-from modelos.producto import Producto
-from modelos.cliente import Cliente
-from servicios.restaurante import Restaurante
+from modelos import Producto, Bebida, Cliente
+from servicios import Restaurante
 
 restaurante = Restaurante()
 
-while True:
+# ==========================
+#        FUNCIONES
+# ==========================
 
+def mostrar_menu():
     print("\n========================================")
     print("      SISTEMA DE RESTAURANTE")
     print("========================================")
     print("1. Registrar producto")
-    print("2. Listar productos")
-    print("3. Buscar producto")
+    print("2. Registrar bebida")
+    print("3. Registrar cliente")
     print("----------------------------------------")
-    print("4. Registrar cliente")
+    print("4. Listar productos")
     print("5. Listar clientes")
-    print("6. Buscar cliente")
     print("----------------------------------------")
-    print("7. Salir")
+    print("6. Salir")
 
-    opcion = input("Seleccione una opción: ")
-
-    if opcion == "1":
-
-        try:
-            nombre = input("Nombre: ")
-            categoria = input("Categoría: ")
-            precio = float(input("Precio: "))
-            disponible = input("Disponible (s/n): ").lower() == "s"
-
-            producto = Producto(
-                nombre,
-                categoria,
-                precio,
-                disponible
-            )
-
-            restaurante.registrar_producto(producto)
-
-            print("Producto registrado.")
-
-        except ValueError as e:
-            print(e)
-
-    elif opcion == "2":
-
-        restaurante.listar_productos()
-
-    elif opcion == "3":
-
-        nombre = input("Nombre del producto: ")
-
-        restaurante.buscar_producto(nombre)
-
-    elif opcion == "4":
-
-        id_cliente = int(input("ID: "))
+def registrar_producto():
+    try:
+        codigo = input("Código: ")
         nombre = input("Nombre: ")
-        correo = input("Correo: ")
+        categoria = input("Categoría: ")
+        precio = float(input("Precio: "))
 
-        cliente = Cliente(
-            id_cliente,
+        producto = Producto(
+            codigo,
             nombre,
-            correo
+            categoria,
+            precio
         )
 
-        restaurante.registrar_cliente(cliente)
+        if restaurante.registrar_producto(producto):
+            print("\n Producto registrado correctamente.")
+        else:
+            print("\n Ya existe un producto con ese código.")
 
-        print("Cliente registrado.")
+    except ValueError as error:
+        print(f"\nError: {error}")
 
-    elif opcion == "5":
+def registrar_bebida():
+    try:
+        codigo = input("Código: ")
+        nombre = input("Nombre: ")
+        categoria = input("Categoría: ")
+        precio = float(input("Precio: "))
+        tamano = input("Tamaño (250 ml, 500 ml, etc.): ")
 
-        restaurante.listar_clientes()
+        bebida = Bebida(
+            codigo,
+            nombre,
+            categoria,
+            precio,
+            tamano
+        )
 
-    elif opcion == "6":
+        if restaurante.registrar_producto(bebida):
+            print("\n Bebida registrada correctamente.")
+        else:
+            print("\n Ya existe un producto con ese código.")
 
-        id_cliente = int(input("ID del cliente: "))
+    except ValueError as error:
+        print(f"\nError: {error}")
 
-        restaurante.buscar_cliente(id_cliente)
+def registrar_cliente():
+    identificacion = input("Identificación: ")
+    nombre = input("Nombre: ")
+    correo = input("Correo: ")
 
-    elif opcion == "7":
+    cliente = Cliente(
+        identificacion,
+        nombre,
+        correo
+    )
 
-        print("Programa finalizado.")
-        break
+    if restaurante.registrar_cliente(cliente):
+        print("\n Cliente registrado correctamente.")
+    else:
+        print("\n Ya existe un cliente con esa identificación.")
+
+
+def listar_productos():
+    restaurante.listar_productos()
+
+
+def listar_clientes():
+    restaurante.listar_clientes()
+
+# ==============================
+#       PROGRAMA PRINCIPAL
+# ==============================
+
+def main():
+
+    while True:
+
+        mostrar_menu()
+
+        opcion = input("\nSeleccione una opción: ")
+
+        if opcion == "1":
+            registrar_producto()
+
+        elif opcion == "2":
+            registrar_bebida()
+
+        elif opcion == "3":
+            registrar_cliente()
+
+        elif opcion == "4":
+            listar_productos()
+
+        elif opcion == "5":
+            listar_clientes()
+
+        elif opcion == "6":
+            print("\nGracias por utilizar el sistema.")
+            break
+
+        else:
+            print("\nOpción no válida.")
+
+if __name__ == "__main__":
+    main()
 
     else:
 
         print("Opción inválida.")
+
+if __name__ == "__main__":
+    main()
