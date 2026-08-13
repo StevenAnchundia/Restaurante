@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
 @dataclass
-class Cliente:
+class Usuario:
     """
-    Clase que representa un cliente.
+    Representa un usuario registrado en el sistema.
     """
 
     identificacion: str
@@ -11,6 +11,7 @@ class Cliente:
     correo: str
 
     def mostrar_informacion(self) -> str:
+
         return (
             f"Identificación: {self.identificacion} | "
             f"Nombre: {self.nombre} | "
