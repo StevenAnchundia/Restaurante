@@ -10,6 +10,7 @@ class Producto:
         categoria: str,
         precio: float
     ):
+
         self.codigo = codigo
         self.nombre = nombre
         self.categoria = categoria
@@ -39,7 +40,6 @@ class Producto:
 
         self.__nombre = valor
 
-    # Categoría
     @property
     def categoria(self) -> str:
         return self.__categoria
