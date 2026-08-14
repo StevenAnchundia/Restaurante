@@ -1,4 +1,4 @@
-## Sistema de Gestión de Restaurante
+# Sistema de Gestión de Restaurante
 
 ## Estudiante
 
@@ -8,83 +8,178 @@
 
 # Descripción
 
-Este proyecto fue desarrollado para la **Proyecto Semana 8** de la asignatura **Programación Orientada a Objetos**.
+Este proyecto fue desarrollado como parte de la **Semana 9** de la asignatura **Programación Orientada a Objetos**.
 
-El sistema permite registrar y listar productos, bebidas y clientes mediante un menú interactivo ejecutado desde consola. El proyecto está organizado siguiendo una arquitectura modular y aplica los principios SOLID solicitados en la actividad.
+El sistema permite administrar productos y usuarios de un restaurante mediante un menú interactivo ejecutado desde la consola. La aplicación utiliza una arquitectura modular organizada en modelos, servicios y un archivo principal, además de aplicar las principales estructuras de datos de Python para gestionar la información del sistema.
 
 ---
+
 # Estructura del proyecto
+
 ```
 restaurante_app/
 │
 ├── modelos/
 │   ├── __init__.py
 │   ├── producto.py
-│   ├── bebida.py
-│   └── cliente.py
+│   └── usuario.py
 │
 ├── servicios/
 │   ├── __init__.py
 │   └── restaurante.py
 │
-└── main.py
+├── main.py
+│
+└── README.md
 ```
 
 ---
-# Responsabilidad de cada clase
 
-### Producto
+# Descripción de los archivos
 
-Representa un producto general del restaurante. Contiene la información común de todos los productos, como código, nombre, categoría y precio.
+## modelos/producto.py
 
-### Bebida
+Contiene la clase **Producto**, encargada de representar los productos del restaurante mediante atributos como:
 
-Hereda de la clase Producto y añade el atributo específico **tamaño**, además de sobrescribir el método `mostrar_informacion()`.
+- Código
+- Nombre
+- Categoría
+- Precio
 
-### Cliente
-
-Representa la información de un cliente registrado en el sistema.
-
-### Restaurante
-
-Administra las listas de productos y clientes, realizando los registros, validaciones y listados correspondientes.
-
-### main.py
-
-Coordina la interacción con el usuario mediante un menú interactivo, solicita los datos necesarios y utiliza la clase Restaurante para gestionar la información.
-
----
-# Relación entre Producto y Bebida
-
-La clase **Bebida** hereda de **Producto**, ya que una bebida es un tipo específico de producto dentro del restaurante.
-
-Gracias a esta relación de herencia, una bebida puede reutilizar los atributos y métodos de Producto, agregando únicamente la información propia del tamaño.
-
----
-# Principios SOLID aplicados
-
-## S - Responsabilidad Única (SRP)
-
-Cada clase tiene una única responsabilidad:
-
-- Producto representa productos.
-- Bebida representa bebidas.
-- Cliente representa clientes.
-- Restaurante administra las colecciones.
-- main.py controla únicamente la interacción con el usuario.
-
----
-## O - Abierto/Cerrado (OCP)
-
-La incorporación de la clase Bebida amplía el sistema mediante herencia sin modificar la lógica principal de la clase Restaurante.
+También incorpora validaciones utilizando **@property** y **@setter**.
 
 ---
 
-## L - Sustitución de Liskov (LSP)
+## modelos/usuario.py
 
-Los objetos de tipo Bebida pueden almacenarse junto con los objetos Producto dentro de la misma colección y ambos responden correctamente al método `mostrar_informacion()` mediante polimorfismo.
+Contiene la clase **Usuario**, implementada mediante **@dataclass**, la cual representa la información básica de una persona registrada en el sistema.
+
+Sus atributos son:
+
+- Identificación
+- Nombre
+- Correo electrónico
 
 ---
+
+## servicios/restaurante.py
+
+Contiene la clase **Restaurante**, responsable de administrar las colecciones de productos y usuarios.
+
+Entre sus funciones se encuentran:
+
+- Registrar productos
+- Buscar productos
+- Actualizar productos
+- Eliminar productos
+- Listar productos
+- Registrar usuarios
+- Listar usuarios
+- Mostrar categorías sin repetir
+
+---
+
+## main.py
+
+Es el punto de entrada del programa.
+
+Presenta un menú interactivo desde consola, solicita la información al usuario y utiliza los métodos de la clase Restaurante para realizar todas las operaciones del sistema.
+
+---
+
+# Estructuras de datos utilizadas
+
+## Lista (list)
+
+Se utiliza para almacenar las colecciones dinámicas del sistema.
+
+```python
+self.productos = []
+self.usuarios = []
+```
+
+Estas listas permiten registrar, buscar, actualizar, eliminar y listar objetos durante la ejecución del programa.
+
+---
+
+## Tupla (tuple)
+
+Se utiliza para almacenar las opciones del menú principal.
+
+```python
+OPCIONES_MENU = (
+    "Registrar producto", "Buscar producto", "Actualizar producto", "Eliminar producto", "Listar productos", "Registrar usuario", "Listar usuarios",         "Mostrar categorías", "Salir"
+)
+```
+
+Al ser información fija, la tupla garantiza que estas opciones no sean modificadas accidentalmente.
+
+---
+
+## Diccionario (dict)
+
+Se utiliza para asociar cada opción del menú con la función que ejecuta la operación correspondiente.
+
+```python
+ACCIONES = {
+    "1": registrar_producto,
+    "2": buscar_producto,
+    "3": actualizar_producto,
+    "4": eliminar_producto,
+    "5": listar_productos,
+    "6": registrar_usuario,
+    "7": listar_usuarios,
+    "8": mostrar_categorias
+}
+```
+
+Esta estructura evita utilizar una gran cantidad de instrucciones condicionales y facilita la organización del programa.
+
+---
+
+## Conjunto (set)
+
+Se utiliza para obtener las categorías de productos sin elementos repetidos.
+
+Resultado mostrado por el sistema:
+
+```
+Comida
+Bebida
+Postre
+```
+---
+
+# Funcionalidades del sistema
+
+El sistema permite realizar las siguientes operaciones:
+
+- Registrar productos.
+- Buscar productos por código.
+- Actualizar la información de un producto.
+- Eliminar productos.
+- Listar todos los productos registrados.
+- Registrar usuarios.
+- Listar usuarios registrados.
+- Mostrar las categorías únicas de los productos.
+
+---
+
+# Validaciones implementadas
+
+El sistema realiza varias validaciones para garantizar la integridad de la información.
+
+Entre ellas:
+
+- No permite registrar productos con códigos duplicados.
+- No permite registrar usuarios con identificaciones repetidas.
+- No permite nombres vacíos.
+- No permite categorías vacías.
+- No permite precios menores o iguales a cero.
+- Utiliza manejo de excepciones para evitar errores durante el ingreso de datos.
+
+---
+
 # Reflexión
 
-La aplicación de los principios SOLID permite desarrollar programas más organizados, reutilizables y fáciles de mantener. La utilización de herencia evita duplicar código, mientras que la separación de responsabilidades facilita futuras modificaciones sin afectar el funcionamiento general del sistema.
+Durante el desarrollo de esta actividad fue posible aplicar las principales estructuras de datos de Python dentro de un proyecto modular orientado a objetos. El uso de listas permitió administrar colecciones dinámicas, la tupla almacenó información constante del sistema, el diccionario facilitó la relación entre las opciones del menú y las funciones disponibles, mientras que el conjunto permitió obtener categorías sin elementos duplicados. Esta organización mejora la claridad, reutilización y mantenimiento del código, favoreciendo el desarrollo de aplicaciones más estructuradas.
