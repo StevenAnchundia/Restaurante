@@ -1,68 +1,139 @@
-from modelos import Producto, Cliente
+from modelos import Producto, Usuario
+
 
 class Restaurante:
     """
-    Clase encargada de administrar productos y clientes.
+    Clase encargada de administrar los productos y usuarios del sistema.
     """
 
     def __init__(self):
+        # Listas (list)
         self.productos: list[Producto] = []
-        self.clientes: list[Cliente] = []
+        self.usuarios: list[Usuario] = []
 
-    # ==========================
+    # =====================================
     # PRODUCTOS
-    # ==========================
+    # =====================================
 
     def registrar_producto(self, producto: Producto) -> bool:
+        """
+        Registra un producto si el código no existe.
+        """
 
-        for producto_existente in self.productos:
-
-            if producto_existente.codigo == producto.codigo:
-                return False
+        if self.buscar_producto(producto.codigo) is not None:
+            return False
 
         self.productos.append(producto)
         return True
 
+    def buscar_producto(self, codigo: str) -> Producto | None:
+        """
+        Busca un producto por su código.
+        """
+
+        for producto in self.productos:
+
+            if producto.codigo == codigo:
+                return producto
+
+        return None
+
+    def actualizar_producto(
+        self,
+        codigo: str,
+        nombre: str,
+        categoria: str,
+        precio: float
+    ) -> bool:
+        """
+        Actualiza un producto existente.
+        """
+
+        producto = self.buscar_producto(codigo)
+
+        if producto is None:
+            return False
+
+        producto.nombre = nombre
+        producto.categoria = categoria
+        producto.precio = precio
+
+        return True
+
+    def eliminar_producto(self, codigo: str) -> bool:
+        """
+        Elimina un producto por código.
+        """
+
+        producto = self.buscar_producto(codigo)
+
+        if producto is None:
+            return False
+
+        self.productos.remove(producto)
+
+        return True
+
     def listar_productos(self):
 
-        if len(self.productos) == 0:
+        if not self.productos:
             print("\nNo existen productos registrados.\n")
             return
 
         print("\n========== PRODUCTOS ==========\n")
 
-        # Polimorfismo
         for producto in self.productos:
             print(producto.mostrar_informacion())
 
         print()
 
-    # ==========================
-    # CLIENTES
-    # ==========================
+    # =====================================
+    # USUARIOS
+    # =====================================
 
-    def registrar_cliente(self, cliente: Cliente) -> bool:
+    def registrar_usuario(self, usuario: Usuario) -> bool:
+        """
+        Registra un usuario.
+        """
 
-        for cliente_existente in self.clientes:
+        for usuario_existente in self.usuarios:
 
             if (
-                cliente_existente.identificacion
-                == cliente.identificacion
+                usuario_existente.identificacion
+                == usuario.identificacion
             ):
                 return False
 
-        self.clientes.append(cliente)
+        self.usuarios.append(usuario)
+
         return True
 
-    def listar_clientes(self):
+    def listar_usuarios(self):
 
-        if len(self.clientes) == 0:
-            print("\nNo existen clientes registrados.\n")
+        if not self.usuarios:
+            print("\nNo existen usuarios registrados.\n")
             return
 
-        print("\n========== CLIENTES ==========\n")
+        print("\n========== USUARIOS ==========\n")
 
-        for cliente in self.clientes:
-            print(cliente.mostrar_informacion())
+        for usuario in self.usuarios:
+            print(usuario.mostrar_informacion())
 
         print()
+
+    # =====================================
+    # SET
+    # =====================================
+
+    def obtener_categorias(self) -> set[str]:
+        """
+        Devuelve las categorías sin repetir.
+        """
+
+        categorias = {
+            producto.categoria
+            for producto in self.productos
+        }
+
+        return categorias
+    
