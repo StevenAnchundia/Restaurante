@@ -8,16 +8,19 @@
 
 # Descripción
 
-Este proyecto fue desarrollado como parte de la **Semana 9** de la asignatura **Programación Orientada a Objetos**.
+Este proyecto fue desarrollado como parte de la asignatura **Programación Orientada a Objetos**.
 
-El sistema permite administrar productos y usuarios de un restaurante mediante un menú interactivo ejecutado desde la consola. La aplicación utiliza una arquitectura modular organizada en modelos, servicios y un archivo principal, además de aplicar las principales estructuras de datos de Python para gestionar la información del sistema.
+El sistema permite administrar productos y usuarios de un restaurante mediante un menú interactivo ejecutado desde la consola. La aplicación utiliza una arquitectura modular organizada en modelos y servicios, y cuenta con **persistencia de datos mediante archivos JSON**, garantizando que la información de los productos no se pierda al cerrar el programa. Además, aplica las principales estructuras de datos de Python para gestionar la información del sistema en memoria.
 
 ---
 
 # Estructura del proyecto
 
-```
+```text
 restaurante_app/
+│
+├── datos/
+│   └── productos.json
 │
 ├── modelos/
 │   ├── __init__.py
@@ -26,11 +29,13 @@ restaurante_app/
 │
 ├── servicios/
 │   ├── __init__.py
+│   ├── archivo_servicio.py
 │   └── restaurante.py
 │
 ├── main.py
 │
 └── README.md
+
 ```
 
 ---
@@ -39,147 +44,72 @@ restaurante_app/
 
 ## modelos/producto.py
 
-Contiene la clase **Producto**, encargada de representar los productos del restaurante mediante atributos como:
-
-- Código
-- Nombre
-- Categoría
-- Precio
-
-También incorpora validaciones utilizando **@property** y **@setter**.
-
----
+Contiene la clase **Producto**, encargada de representar los productos del restaurante mediante atributos como Código, Nombre, Categoría y Precio. Incorpora validaciones utilizando **@property** y **@setter**, y cuenta con el método `to_dict()` para facilitar su serialización a JSON.
 
 ## modelos/usuario.py
 
 Contiene la clase **Usuario**, implementada mediante **@dataclass**, la cual representa la información básica de una persona registrada en el sistema.
 
-Sus atributos son:
-
-- Identificación
-- Nombre
-- Correo electrónico
-
----
-
 ## servicios/restaurante.py
 
-Contiene la clase **Restaurante**, responsable de administrar las colecciones de productos y usuarios.
+Contiene la clase **Restaurante**, responsable de administrar las colecciones de productos y usuarios en memoria (listas). Se encarga de la lógica de negocio como registrar, buscar, actualizar, eliminar y listar.
 
-Entre sus funciones se encuentran:
+## servicios/archivo_servicio.py
 
-- Registrar productos
-- Buscar productos
-- Actualizar productos
-- Eliminar productos
-- Listar productos
-- Registrar usuarios
-- Listar usuarios
-- Mostrar categorías sin repetir
+Contiene la clase **ArchivoServicio**, encargada exclusivamente de la persistencia de datos. Utiliza la librería `json` para leer y escribir la colección de objetos `Producto` en el archivo `productos.json`.
 
----
+## datos/productos.json
+
+Archivo de texto en formato JSON donde se almacenan físicamente los registros de los productos.
 
 ## main.py
 
-Es el punto de entrada del programa.
+Es el punto de entrada del programa. Coordina la carga inicial de datos, presenta un menú interactivo desde consola, solicita la información al usuario, utiliza los métodos de la clase `Restaurante` y sincroniza los cambios llamando a `ArchivoServicio` para guardar la información.
 
-Presenta un menú interactivo desde consola, solicita la información al usuario y utiliza los métodos de la clase Restaurante para realizar todas las operaciones del sistema.
+---
+
+# Persistencia de Datos (Flujo de carga y guardado)
+
+El sistema integra un flujo de persistencia transparente para el usuario:
+
+* **Carga de datos:** Al iniciar `main.py`, se invoca el método `cargar_productos()`. Mediante `with open()` y `json.load()`, se lee el archivo `productos.json`, se validan los registros y se reconstruyen como objetos `Producto` válidos que se cargan en la memoria del restaurante.
+* **Guardado de datos:** Cada vez que el usuario realiza una operación de escritura (Registrar, Actualizar o Eliminar un producto), el sistema llama automáticamente al método `guardar_productos()`. Los objetos se convierten a diccionarios y se guardan en el archivo usando `json.dump()` con codificación UTF-8, asegurando que el archivo siempre esté sincronizado con la memoria.
 
 ---
 
 # Estructuras de datos utilizadas
 
-## Lista (list)
+* **Lista (list):** Almacena las colecciones dinámicas de productos y usuarios (`self.productos`, `self.usuarios`).
+* **Tupla (tuple):** Almacena de forma inmutable las opciones del menú principal (`OPCIONES_MENU`).
+* **Diccionario (dict):** Asocia cada opción del menú con la función que ejecuta la operación correspondiente (`ACCIONES`).
+* **Conjunto (set):** Se utiliza para obtener y mostrar las categorías de productos evitando elementos duplicados.
 
-Se utiliza para almacenar las colecciones dinámicas del sistema.
+---
 
-```python
-self.productos = []
-self.usuarios = []
+# Manejo de Excepciones
+
+Para garantizar la estabilidad del sistema, se controlan múltiples excepciones, especialmente durante la manipulación de archivos:
+
+* **`FileNotFoundError`:** Si `productos.json` no existe al iniciar, el sistema lo notifica y arranca con una lista vacía sin detenerse.
+* **`json.JSONDecodeError`:** Captura errores si el archivo JSON está dañado o vacío inicialmente.
+* **`PermissionError`:** Avisa si no hay permisos de lectura o escritura en el directorio.
+* **`KeyError` y `ValueError`:** Valida que los datos leídos del JSON estén completos y cumplan con las reglas de negocio (ej. precios mayores a cero) al reconstruir los objetos, omitiendo registros corruptos sin cerrar la aplicación.
+
+---
+
+# Ejecución y Pruebas
+
+Para ejecutar el programa, asegúrese de estar en el directorio raíz del proyecto y ejecute:
+
+```bash
+python main.py
+
 ```
 
-Estas listas permiten registrar, buscar, actualizar, eliminar y listar objetos durante la ejecución del programa.
+**Evidencia de pruebas de persistencia:**
+Se comprobó satisfactoriamente la persistencia de datos cerrando y reiniciando el programa. Al agregar nuevos productos, salir de la aplicación (Opción 9) y volver a ejecutar `main.py`, el sistema recuperó con éxito toda la información guardada en `productos.json`, listando los productos previamente registrados sin ninguna pérdida de datos.
 
----
-
-## Tupla (tuple)
-
-Se utiliza para almacenar las opciones del menú principal.
-
-```python
-OPCIONES_MENU = (
-    "Registrar producto", "Buscar producto", "Actualizar producto", "Eliminar producto", "Listar productos", "Registrar usuario", "Listar usuarios",         "Mostrar categorías", "Salir"
-)
-```
-
-Al ser información fija, la tupla garantiza que estas opciones no sean modificadas accidentalmente.
-
----
-
-## Diccionario (dict)
-
-Se utiliza para asociar cada opción del menú con la función que ejecuta la operación correspondiente.
-
-```python
-ACCIONES = {
-    "1": registrar_producto,
-    "2": buscar_producto,
-    "3": actualizar_producto,
-    "4": eliminar_producto,
-    "5": listar_productos,
-    "6": registrar_usuario,
-    "7": listar_usuarios,
-    "8": mostrar_categorias
-}
-```
-
-Esta estructura evita utilizar una gran cantidad de instrucciones condicionales y facilita la organización del programa.
-
----
-
-## Conjunto (set)
-
-Se utiliza para obtener las categorías de productos sin elementos repetidos.
-
-Resultado mostrado por el sistema:
-
-```
-Comida
-Bebida
-Postre
-```
----
-
-# Funcionalidades del sistema
-
-El sistema permite realizar las siguientes operaciones:
-
-- Registrar productos.
-- Buscar productos por código.
-- Actualizar la información de un producto.
-- Eliminar productos.
-- Listar todos los productos registrados.
-- Registrar usuarios.
-- Listar usuarios registrados.
-- Mostrar las categorías únicas de los productos.
-
----
-
-# Validaciones implementadas
-
-El sistema realiza varias validaciones para garantizar la integridad de la información.
-
-Entre ellas:
-
-- No permite registrar productos con códigos duplicados.
-- No permite registrar usuarios con identificaciones repetidas.
-- No permite nombres vacíos.
-- No permite categorías vacías.
-- No permite precios menores o iguales a cero.
-- Utiliza manejo de excepciones para evitar errores durante el ingreso de datos.
-
----
 
 # Reflexión
 
-Durante el desarrollo de esta actividad fue posible aplicar las principales estructuras de datos de Python dentro de un proyecto modular orientado a objetos. El uso de listas permitió administrar colecciones dinámicas, la tupla almacenó información constante del sistema, el diccionario facilitó la relación entre las opciones del menú y las funciones disponibles, mientras que el conjunto permitió obtener categorías sin elementos duplicados. Esta organización mejora la claridad, reutilización y mantenimiento del código, favoreciendo el desarrollo de aplicaciones más estructuradas.
+Durante el desarrollo de esta actividad fue posible evolucionar un proyecto modular en Python incorporando persistencia de datos mediante archivos JSON. Se logró separar las responsabilidades creando un servicio específico para el manejo de archivos sin romper la arquitectura existente. El uso robusto del manejo de excepciones asegura que el programa sea resiliente ante errores externos, demostrando cómo construir aplicaciones más estructuradas, seguras y funcionales a largo plazo.
