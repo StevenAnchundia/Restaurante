@@ -1,15 +1,17 @@
-from modelos import Producto, Usuario
+from modelos import Producto, Usuario, Venta
 
 
 class Restaurante:
     """
-    Clase encargada de administrar los productos y usuarios del sistema.
+    Clase encargada de administrar los productos,
+    usuarios y ventas del sistema.
     """
 
     def __init__(self):
-        # Listas (list)
+        # Colecciones
         self.productos: list[Producto] = []
         self.usuarios: list[Usuario] = []
+        self.ventas: list[Venta] = []
 
     # =====================================
     # PRODUCTOS
@@ -28,7 +30,7 @@ class Restaurante:
 
     def buscar_producto(self, codigo: str) -> Producto | None:
         """
-        Busca un producto por su código.
+        Busca un producto por código.
         """
 
         for producto in self.productos:
@@ -43,7 +45,8 @@ class Restaurante:
         codigo: str,
         nombre: str,
         categoria: str,
-        precio: float
+        precio: float,
+        stock: int
     ) -> bool:
         """
         Actualiza un producto existente.
@@ -57,6 +60,7 @@ class Restaurante:
         producto.nombre = nombre
         producto.categoria = categoria
         producto.precio = precio
+        producto.stock = stock
 
         return True
 
@@ -96,17 +100,27 @@ class Restaurante:
         Registra un usuario.
         """
 
-        for usuario_existente in self.usuarios:
-
-            if (
-                usuario_existente.identificacion
-                == usuario.identificacion
-            ):
-                return False
+        if self.buscar_usuario(usuario.identificacion) is not None:
+            return False
 
         self.usuarios.append(usuario)
 
         return True
+
+    def buscar_usuario(
+        self,
+        identificacion: str
+    ) -> Usuario | None:
+        """
+        Busca un usuario por identificación.
+        """
+
+        for usuario in self.usuarios:
+
+            if usuario.identificacion == identificacion:
+                return usuario
+
+        return None
 
     def listar_usuarios(self):
 
@@ -118,6 +132,82 @@ class Restaurante:
 
         for usuario in self.usuarios:
             print(usuario.mostrar_informacion())
+
+        print()
+
+    # =====================================
+    # VENTAS
+    # =====================================
+
+    def vender_producto(
+        self,
+        codigo_producto: str,
+        identificacion_usuario: str,
+        cantidad: int
+    ) -> tuple[bool, str]:
+        """
+        Realiza una venta.
+        """
+
+        usuario = self.buscar_usuario(
+            identificacion_usuario
+        )
+
+        if usuario is None:
+            return False, "El usuario no existe."
+
+        producto = self.buscar_producto(
+            codigo_producto
+        )
+
+        if producto is None:
+            return False, "El producto no existe."
+
+        if cantidad <= 0:
+            return False, "Cantidad inválida."
+
+        if producto.stock < cantidad:
+            return False, "Stock insuficiente."
+
+        venta = Venta(
+            usuario.identificacion,
+            producto.codigo,
+            cantidad
+        )
+
+        self.ventas.append(venta)
+
+        producto.vender(cantidad)
+
+        return True, "Venta registrada correctamente."
+
+    def consultar_ventas_usuario(
+        self,
+        identificacion: str
+    ) -> list[Venta]:
+        """
+        Devuelve todas las ventas realizadas por un usuario.
+        """
+
+        ventas_usuario = []
+
+        for venta in self.ventas:
+
+            if venta.usuario_id == identificacion:
+                ventas_usuario.append(venta)
+
+        return ventas_usuario
+
+    def listar_ventas(self):
+
+        if not self.ventas:
+            print("\nNo existen ventas registradas.\n")
+            return
+
+        print("\n========== VENTAS ==========\n")
+
+        for venta in self.ventas:
+            print(venta.mostrar_informacion())
 
         print()
 
@@ -136,4 +226,3 @@ class Restaurante:
         }
 
         return categorias
-    
