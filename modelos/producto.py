@@ -9,15 +9,17 @@ class Producto:
         codigo: str,
         nombre: str,
         categoria: str,
-        precio: float
+        precio: float,
+        stock: int
     ):
         self.codigo = codigo
         self.nombre = nombre
         self.categoria = categoria
         self.precio = precio
+        self.stock = stock
 
     # Código
-
+    
     @property
     def codigo(self) -> str:
         return self.__codigo
@@ -41,7 +43,7 @@ class Producto:
         self.__nombre = valor
 
     # Categoría
-
+    
     @property
     def categoria(self) -> str:
         return self.__categoria
@@ -64,6 +66,29 @@ class Producto:
             raise ValueError("El precio debe ser mayor que cero.")
         self.__precio = valor
 
+    # Stock
+
+    @property
+    def stock(self) -> int:
+        return self.__stock
+
+    @stock.setter
+    def stock(self, valor: int):
+        if valor < 0:
+            raise ValueError("El stock no puede ser negativo.")
+        self.__stock = valor
+
+    # Venta
+
+    def vender(self, cantidad: int):
+        if cantidad <= 0:
+            raise ValueError("La cantidad debe ser mayor que cero.")
+
+        if cantidad > self.stock:
+            raise ValueError("Stock insuficiente.")
+
+        self.stock -= cantidad
+
     # Mostrar información
 
     def mostrar_informacion(self) -> str:
@@ -71,19 +96,17 @@ class Producto:
             f"Código: {self.codigo} | "
             f"Nombre: {self.nombre} | "
             f"Categoría: {self.categoria} | "
-            f"Precio: ${self.precio:.2f}"
+            f"Precio: ${self.precio:.2f} | "
+            f"Stock: {self.stock}"
         )
 
-    # Convertir a diccionario
+    # JSON
 
     def to_dict(self) -> dict:
-        """
-        Convierte el objeto Producto en un diccionario
-        para poder almacenarlo en formato JSON.
-        """
         return {
             "codigo": self.codigo,
             "nombre": self.nombre,
             "categoria": self.categoria,
-            "precio": self.precio
+            "precio": self.precio,
+            "stock": self.stock
         }
