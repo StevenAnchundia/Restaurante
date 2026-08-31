@@ -1,79 +1,49 @@
 import json
-from modelos import Producto
+import os
+
+from modelos.producto import Producto
+from modelos.usuario import Usuario
+from modelos.venta import Venta
 
 
 class ArchivoServicio:
 
-    def __init__(self, ruta_archivo: str):
-        self.ruta_archivo = ruta_archivo
+    def __init__(self):
 
-    # CARGAR PRODUCTOS
+        self.carpeta = "datos"
 
-    def cargar_productos(self) -> list[Producto]:
+        os.makedirs(self.carpeta, exist_ok=True)
 
-        productos = []
+        self.productos_archivo = os.path.join(
+            self.carpeta,
+            "productos.json"
+        )
 
-        try:
+        self.usuarios_archivo = os.path.join(
+            self.carpeta,
+            "usuarios.json"
+        )
 
-            with open(
-                self.ruta_archivo,
-                "r",
-                encoding="utf-8"
-            ) as archivo:
+        self.ventas_archivo = os.path.join(
+            self.carpeta,
+            "ventas.json"
+        )
 
-                datos = json.load(archivo)
+    # ==========================================
+    # PRODUCTOS
+    # ==========================================
 
-                for registro in datos:
-
-                    try:
-
-                        producto = Producto(
-                            registro["codigo"],
-                            registro["nombre"],
-                            registro["categoria"],
-                            registro["precio"]
-                        )
-
-                        productos.append(producto)
-
-                    except KeyError:
-                        print(
-                            "Registro incompleto encontrado en el archivo."
-                        )
-
-                    except ValueError as error:
-                        print(error)
-
-        except FileNotFoundError:
-
-            print("Archivo JSON no encontrado. Se iniciará vacío.")
-
-        except json.JSONDecodeError:
-
-            print("El archivo JSON está dañado.")
-
-        except PermissionError:
-
-            print("No existen permisos para leer el archivo.")
-
-        return productos
-
-    # GUARDAR PRODUCTOS
-  
-    def guardar_productos(
-        self,
-        productos: list[Producto]
-    ):
-
-        datos = [
-            producto.to_dict()
-            for producto in productos
-        ]
+    def guardar_productos(self, productos):
 
         try:
 
+            datos = []
+
+            for producto in productos:
+                datos.append(producto.to_dict())
+
             with open(
-                self.ruta_archivo,
+                self.productos_archivo,
                 "w",
                 encoding="utf-8"
             ) as archivo:
@@ -86,5 +56,175 @@ class ArchivoServicio:
                 )
 
         except PermissionError:
+            print("No se pudo guardar productos.json")
 
-            print("No existen permisos para guardar el archivo.")
+    def cargar_productos(self):
+
+        try:
+
+            with open(
+                self.productos_archivo,
+                "r",
+                encoding="utf-8"
+            ) as archivo:
+
+                datos = json.load(archivo)
+
+                productos = []
+
+                for p in datos:
+
+                    producto = Producto(
+                        p["codigo"],
+                        p["nombre"],
+                        p["categoria"],
+                        p["precio"],
+                        p["stock"]
+                    )
+
+                    productos.append(producto)
+
+                return productos
+
+        except FileNotFoundError:
+            return []
+
+        except json.JSONDecodeError:
+            print("productos.json está dañado.")
+            return []
+
+        except KeyError:
+            print("Error en las claves de productos.json")
+            return []
+
+    # ==========================================
+    # USUARIOS
+    # ==========================================
+
+    def guardar_usuarios(self, usuarios):
+
+        try:
+
+            datos = []
+
+            for usuario in usuarios:
+                datos.append(usuario.to_dict())
+
+            with open(
+                self.usuarios_archivo,
+                "w",
+                encoding="utf-8"
+            ) as archivo:
+
+                json.dump(
+                    datos,
+                    archivo,
+                    indent=4,
+                    ensure_ascii=False
+                )
+
+        except PermissionError:
+            print("No fue posible guardar usuarios.")
+
+    def cargar_usuarios(self):
+
+        try:
+
+            with open(
+                self.usuarios_archivo,
+                "r",
+                encoding="utf-8"
+            ) as archivo:
+
+                datos = json.load(archivo)
+
+                usuarios = []
+
+                for u in datos:
+
+                    usuario = Usuario(
+                        u["identificacion"],
+                        u["nombre"],
+                        u["correo"]
+                    )
+
+                    usuarios.append(usuario)
+
+                return usuarios
+
+        except FileNotFoundError:
+            return []
+
+        except json.JSONDecodeError:
+            print("usuarios.json inválido.")
+            return []
+
+        except KeyError:
+            print("Faltan datos en usuarios.json")
+            return []
+
+    # ==========================================
+    # VENTAS
+    # ==========================================
+
+    def guardar_ventas(self, ventas):
+
+        try:
+
+            datos = []
+
+            for venta in ventas:
+                datos.append(venta.to_dict())
+
+            with open(
+                self.ventas_archivo,
+                "w",
+                encoding="utf-8"
+            ) as archivo:
+
+                json.dump(
+                    datos,
+                    archivo,
+                    indent=4,
+                    ensure_ascii=False
+                )
+
+        except PermissionError:
+            print("No fue posible guardar ventas.")
+
+    def cargar_ventas(self):
+
+        try:
+
+            with open(
+                self.ventas_archivo,
+                "r",
+                encoding="utf-8"
+            ) as archivo:
+
+                datos = json.load(archivo)
+
+                ventas = []
+
+                for v in datos:
+
+                    venta = Venta(
+                        v["usuario_id"],
+                        v["producto_codigo"],
+                        v["cantidad"]
+                    )
+
+                    ventas.append(venta)
+
+                return ventas
+
+        except FileNotFoundError:
+            return []
+
+        except json.JSONDecodeError:
+            print("ventas.json inválido.")
+            return []
+
+        except KeyError:
+            print("Faltan datos en ventas.json")
+            return []
