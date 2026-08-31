@@ -9,7 +9,7 @@ from servicios.archivo_servicio import ArchivoServicio
 # ==========================================
 
 restaurante = Restaurante()
-archivo_servicio = ArchivoServicio("datos/productos.json")
+archivo_servicio = ArchivoServicio()
 
 
 # ==========================================
@@ -17,11 +17,7 @@ archivo_servicio = ArchivoServicio("datos/productos.json")
 # ==========================================
 
 restaurante.productos = archivo_servicio.cargar_productos()
-
-try:
-    restaurante.usuarios = archivo_servicio.cargar_usuarios()
-except AttributeError:
-    restaurante.usuarios = []
+restaurante.usuarios = archivo_servicio.cargar_usuarios()
 
 
 # ==========================================
@@ -42,11 +38,11 @@ OPCIONES_MENU = (
 
 
 # ==========================================
-# FUNCIONES
+# MOSTRAR MENÚ
 # ==========================================
 
-
 def mostrar_menu():
+
     print("\n========================================")
     print("        SISTEMA DE RESTAURANTE")
     print("========================================")
@@ -57,6 +53,7 @@ def mostrar_menu():
     print()
 
 
+
 # ==========================================
 # PRODUCTOS
 # ==========================================
@@ -65,17 +62,22 @@ def mostrar_menu():
 def registrar_producto():
 
     try:
+
         codigo = input("Código: ")
         nombre = input("Nombre: ")
         categoria = input("Categoría: ")
         precio = float(input("Precio: "))
+        stock = int(input("Stock: "))
+
 
         producto = Producto(
             codigo,
             nombre,
             categoria,
-            precio
+            precio,
+            stock
         )
+
 
         if restaurante.registrar_producto(producto):
 
@@ -86,10 +88,14 @@ def registrar_producto():
             print("\nProducto registrado correctamente.")
 
         else:
+
             print("\nYa existe un producto con ese código.")
 
+
     except ValueError as error:
+
         print(f"\nError: {error}")
+
 
 
 
@@ -97,7 +103,9 @@ def buscar_producto():
 
     codigo = input("Ingrese el código: ")
 
+
     producto = restaurante.buscar_producto(codigo)
+
 
     if producto:
 
@@ -105,7 +113,9 @@ def buscar_producto():
         print(producto.mostrar_informacion())
 
     else:
+
         print("\nProducto no encontrado.")
+
 
 
 
@@ -113,7 +123,9 @@ def actualizar_producto():
 
     codigo = input("Código del producto: ")
 
+
     producto = restaurante.buscar_producto(codigo)
+
 
     if producto is None:
 
@@ -126,13 +138,15 @@ def actualizar_producto():
         nombre = input("Nuevo nombre: ")
         categoria = input("Nueva categoría: ")
         precio = float(input("Nuevo precio: "))
+        stock = int(input("Nuevo stock: "))
 
 
         resultado = restaurante.actualizar_producto(
             codigo,
             nombre,
             categoria,
-            precio
+            precio,
+            stock
         )
 
 
@@ -145,12 +159,14 @@ def actualizar_producto():
             print("\nProducto actualizado correctamente.")
 
         else:
+
             print("\nNo se pudo actualizar el producto.")
 
 
     except ValueError as error:
 
         print(f"\nError: {error}")
+
 
 
 
@@ -170,6 +186,7 @@ def eliminar_producto():
     else:
 
         print("\nProducto no encontrado.")
+
 
 
 
@@ -200,16 +217,9 @@ def registrar_usuario():
 
     if restaurante.registrar_usuario(usuario):
 
-        try:
-
-            archivo_servicio.guardar_usuarios(
-                restaurante.usuarios
-            )
-
-        except AttributeError:
-
-            pass
-
+        archivo_servicio.guardar_usuarios(
+            restaurante.usuarios
+        )
 
         print("\nUsuario registrado correctamente.")
 
@@ -219,9 +229,11 @@ def registrar_usuario():
 
 
 
+
 def listar_usuarios():
 
     restaurante.listar_usuarios()
+
 
 
 
@@ -241,17 +253,19 @@ def mostrar_categorias():
         return
 
 
-    print("\n===== CATEGORÍAS =====\n")
+    print("\n===== CATEGORÍAS =====")
 
 
     for categoria in categorias:
 
         print(categoria)
 
+
+
+
 # ==========================================
 # DICCIONARIO DE ACCIONES
 # ==========================================
-
 
 ACCIONES = {
 
@@ -269,9 +283,8 @@ ACCIONES = {
 
 
 # ==========================================
-# PROGRAMA PRINCIPAL
+# FUNCIÓN PRINCIPAL
 # ==========================================
-
 
 def main():
 
@@ -290,6 +303,7 @@ def main():
 
         accion = ACCIONES.get(opcion)
 
+
         if accion:
 
             accion()
@@ -297,6 +311,8 @@ def main():
         else:
 
             print("\nOpción inválida.")
+
+
 
 
 if __name__ == "__main__":
