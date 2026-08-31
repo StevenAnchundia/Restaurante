@@ -1,2 +1,65 @@
-
-[]
+[
+    {
+        "codigo": "P001",
+        "nombre": "Hamburguesa Clasica",
+        "categoria": "Comida",
+        "precio": 5.50,
+        "stock": 20
+    },
+    {
+        "codigo": "P002",
+        "nombre": "Pizza Familiar",
+        "categoria": "Comida",
+        "precio": 12.00,
+        "stock": 15
+    },
+    {
+        "codigo": "P003",
+        "nombre": "Sandwich de Pollo",
+        "categoria": "Comida",
+        "precio": 4.75,
+        "stock": 25
+    },
+    {
+        "codigo": "P004",
+        "nombre": "Ensalada Cesar",
+        "categoria": "Comida",
+        "precio": 6.00,
+        "stock": 10
+    },
+    {
+        "codigo": "B001",
+        "nombre": "Coca Cola",
+        "categoria": "Bebida",
+        "precio": 1.50,
+        "stock": 50
+    },
+    {
+        "codigo": "B002",
+        "nombre": "Jugo Natural",
+        "categoria": "Bebida",
+        "precio": 2.25,
+        "stock": 30
+    },
+    {
+        "codigo": "B003",
+        "nombre": "Cafe",
+        "categoria": "Bebida",
+        "precio": 1.75,
+        "stock": 40
+    },
+    {
+        "codigo": "PST001",
+        "nombre": "Pastel de Chocolate",
+        "categoria": "Postre",
+        "precio": 3.50,
+        "stock": 12
+    },
+    {
+        "codigo": "PST002",
+        "nombre": "Helado Vainilla",
+        "categoria": "Postre",
+        "precio": 2.00,
+        "stock": 18
+    }
+]
