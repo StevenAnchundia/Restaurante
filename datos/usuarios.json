@@ -1,1 +1,27 @@
-[]
+[
+    {
+        "identificacion": "0901234567",
+        "nombre": "Carlos Mendoza",
+        "correo": "carlos.mendoza@gmail.com"
+    },
+    {
+        "identificacion": "0912345678",
+        "nombre": "Maria Suarez",
+        "correo": "maria.suarez@hotmail.com"
+    },
+    {
+        "identificacion": "0923456789",
+        "nombre": "Luis Reyes",
+        "correo": "luis.reyes@yahoo.com"
+    },
+    {
+        "identificacion": "0934567890",
+        "nombre": "Ana Torres",
+        "correo": "ana.torres@gmail.com"
+    },
+    {
+        "identificacion": "0945678901",
+        "nombre": "Pedro Vargas",
+        "correo": "pedro.vargas@outlook.com"
+    }
+]
