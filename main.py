@@ -12,7 +12,8 @@ archivo_servicio = ArchivoServicio()
 
 
 # ==========================================
-# CARGA INICIAL
+# CARGA INICIAL — los setters reconstruyen
+# los índices auxiliares automáticamente
 # ==========================================
 
 restaurante.productos = archivo_servicio.cargar_productos()
@@ -35,6 +36,7 @@ OPCIONES_MENU = (
     "Mostrar categorías",
     "Registrar venta",
     "Listar ventas",
+    "Consultar ventas por usuario",
     "Salir"
 )
 
@@ -55,7 +57,6 @@ def mostrar_menu():
     print()
 
 
-
 # ==========================================
 # PRODUCTOS
 # ==========================================
@@ -70,7 +71,6 @@ def registrar_producto():
         precio = float(input("Precio: "))
         stock = int(input("Stock: "))
 
-
         producto = Producto(
             codigo,
             nombre,
@@ -78,7 +78,6 @@ def registrar_producto():
             precio,
             stock
         )
-
 
         if restaurante.registrar_producto(producto):
 
@@ -92,11 +91,9 @@ def registrar_producto():
 
             print("\nYa existe un producto con ese código.")
 
-
     except ValueError as error:
 
         print(f"\nError: {error}")
-
 
 
 def buscar_producto():
@@ -104,7 +101,6 @@ def buscar_producto():
     codigo = input("Código del producto: ")
 
     producto = restaurante.buscar_producto(codigo)
-
 
     if producto:
 
@@ -116,19 +112,16 @@ def buscar_producto():
         print("\nProducto no encontrado.")
 
 
-
 def actualizar_producto():
 
     codigo = input("Código del producto: ")
 
     producto = restaurante.buscar_producto(codigo)
 
-
     if producto is None:
 
         print("\nProducto no encontrado.")
         return
-
 
     try:
 
@@ -136,7 +129,6 @@ def actualizar_producto():
         categoria = input("Nueva categoría: ")
         precio = float(input("Nuevo precio: "))
         stock = int(input("Nuevo stock: "))
-
 
         if restaurante.actualizar_producto(
             codigo,
@@ -156,17 +148,14 @@ def actualizar_producto():
 
             print("\nNo se pudo actualizar.")
 
-
     except ValueError as error:
 
         print(f"\nError: {error}")
 
 
-
 def eliminar_producto():
 
     codigo = input("Código del producto: ")
-
 
     if restaurante.eliminar_producto(codigo):
 
@@ -181,11 +170,9 @@ def eliminar_producto():
         print("\nProducto no encontrado.")
 
 
-
 def listar_productos():
 
     restaurante.listar_productos()
-
 
 
 # ==========================================
@@ -200,13 +187,11 @@ def registrar_usuario():
         nombre = input("Nombre: ")
         correo = input("Correo: ")
 
-
         usuario = Usuario(
             identificacion,
             nombre,
             correo
         )
-
 
         if restaurante.registrar_usuario(usuario):
 
@@ -220,17 +205,14 @@ def registrar_usuario():
 
             print("\nEl usuario ya existe.")
 
-
     except ValueError as error:
 
         print(f"\nError: {error}")
 
 
-
 def listar_usuarios():
 
     restaurante.listar_usuarios()
-
 
 
 # ==========================================
@@ -241,21 +223,17 @@ def mostrar_categorias():
 
     categorias = restaurante.obtener_categorias()
 
-
     if not categorias:
 
         print("\nNo existen categorías.")
 
         return
 
-
     print("\n========== CATEGORÍAS ==========")
 
-
-    for categoria in categorias:
+    for categoria in sorted(categorias):
 
         print(categoria)
-
 
 
 # ==========================================
@@ -278,13 +256,11 @@ def registrar_venta():
             input("Cantidad: ")
         )
 
-
         resultado, mensaje = restaurante.vender_producto(
             codigo_producto,
             identificacion_usuario,
             cantidad
         )
-
 
         if resultado:
 
@@ -296,20 +272,44 @@ def registrar_venta():
                 restaurante.ventas
             )
 
-
         print("\n" + mensaje)
-
 
     except ValueError as error:
 
         print(f"\nError: {error}")
 
 
-
 def listar_ventas():
 
     restaurante.listar_ventas()
 
+
+def consultar_ventas_usuario():
+    """
+    Consulta las ventas de un usuario usando el índice
+    _ventas_por_usuario — acceso O(1) sin recorrer la lista.
+    """
+
+    identificacion = input("Identificación del usuario: ")
+
+    usuario = restaurante.buscar_usuario(identificacion)
+
+    if usuario is None:
+        print("\nUsuario no encontrado.")
+        return
+
+    ventas = restaurante.consultar_ventas_usuario(identificacion)
+
+    if not ventas:
+        print(f"\nEl usuario {usuario.nombre} no tiene ventas registradas.")
+        return
+
+    print(f"\n===== VENTAS DE {usuario.nombre.upper()} =====\n")
+
+    for venta in ventas:
+        print(venta.mostrar_informacion())
+
+    print()
 
 
 # ==========================================
@@ -327,10 +327,10 @@ ACCIONES = {
     "7": listar_usuarios,
     "8": mostrar_categorias,
     "9": registrar_venta,
-    "10": listar_ventas
+    "10": listar_ventas,
+    "11": consultar_ventas_usuario
 
 }
-
 
 
 # ==========================================
@@ -347,15 +347,12 @@ def main():
             "Seleccione una opción: "
         )
 
-
-        if opcion == "11":
+        if opcion == "12":
 
             print("\nGracias por utilizar el sistema.")
             break
 
-
         accion = ACCIONES.get(opcion)
-
 
         if accion:
 
@@ -364,7 +361,6 @@ def main():
         else:
 
             print("\nOpción inválida.")
-
 
 
 if __name__ == "__main__":
