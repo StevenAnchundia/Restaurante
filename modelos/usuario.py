@@ -14,6 +14,7 @@ class Usuario:
         self.correo = correo
 
     # Identificación
+
     @property
     def identificacion(self) -> str:
         return self.__identificacion
