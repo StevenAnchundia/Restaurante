@@ -6,110 +6,135 @@
 
 ---
 
-# Descripción
+## Descripción general
 
-Este proyecto fue desarrollado como parte de la asignatura **Programación Orientada a Objetos**.
-
-El sistema permite administrar productos y usuarios de un restaurante mediante un menú interactivo ejecutado desde la consola. La aplicación utiliza una arquitectura modular organizada en modelos y servicios, y cuenta con **persistencia de datos mediante archivos JSON**, garantizando que la información de los productos no se pierda al cerrar el programa. Además, aplica las principales estructuras de datos de Python para gestionar la información del sistema en memoria.
+Este proyecto es la evolución de `restaurante_app` correspondiente a la **Semana 12** de Programación Orientada a Objetos. Conserva todas las funcionalidades de la Semana 11 (registro de productos, usuarios y ventas, control de stock, persistencia JSON) e incorpora mejoras internas de rendimiento mediante el uso adecuado de colecciones.
 
 ---
 
-# Estructura del proyecto
+## Estructura del proyecto
 
-```text
 restaurante_app/
-│
 ├── datos/
-│   └── productos.json
-│
+│   ├── productos.json
+│   ├── usuarios.json
+│   └── ventas.json
 ├── modelos/
 │   ├── __init__.py
 │   ├── producto.py
-│   └── usuario.py
-│
+│   ├── usuario.py
+│   └── venta.py
 ├── servicios/
 │   ├── __init__.py
 │   ├── archivo_servicio.py
 │   └── restaurante.py
-│
-├── main.py
-│
-└── README.md
-
-```
+└── main.py
 
 ---
 
-# Descripción de los archivos
+## Mejoras de rendimiento aplicadas (Semana 12)
 
-## modelos/producto.py
+Las mejoras se implementaron íntegramente dentro de `servicios/restaurante.py`, sin trasladar responsabilidades a `main.py`.
 
-Contiene la clase **Producto**, encargada de representar los productos del restaurante mediante atributos como Código, Nombre, Categoría y Precio. Incorpora validaciones utilizando **@property** y **@setter**, y cuenta con el método `to_dict()` para facilitar su serialización a JSON.
+### 1. Índice de productos — dict por código
 
-## modelos/usuario.py
+Semana 11 → buscar_producto(codigo): recorre toda la lista con for — O(n)
+Semana 12 → acceso directo al dict — O(1)
+Semana 11 → registrar_producto (validar unicidad): llama a buscar_producto que recorre la lista
+Semana 12 → comprobación `in` sobre el dict — O(1)
 
-Contiene la clase **Usuario**, implementada mediante **@dataclass**, la cual representa la información básica de una persona registrada en el sistema.
-
-## servicios/restaurante.py
-
-Contiene la clase **Restaurante**, responsable de administrar las colecciones de productos y usuarios en memoria (listas). Se encarga de la lógica de negocio como registrar, buscar, actualizar, eliminar y listar.
-
-## servicios/archivo_servicio.py
-
-Contiene la clase **ArchivoServicio**, encargada exclusivamente de la persistencia de datos. Utiliza la librería `json` para leer y escribir la colección de objetos `Producto` en el archivo `productos.json`.
-
-## datos/productos.json
-
-Archivo de texto en formato JSON donde se almacenan físicamente los registros de los productos.
-
-## main.py
-
-Es el punto de entrada del programa. Coordina la carga inicial de datos, presenta un menú interactivo desde consola, solicita la información al usuario, utiliza los métodos de la clase `Restaurante` y sincroniza los cambios llamando a `ArchivoServicio` para guardar la información.
+Colección auxiliar: _indice_productos: dict[str, Producto]
+Clave: código del producto
+Valor: referencia al objeto Producto
 
 ---
 
-# Persistencia de Datos (Flujo de carga y guardado)
+### 2. Índice de usuarios — dict por identificación
 
-El sistema integra un flujo de persistencia transparente para el usuario:
+Semana 11 → buscar_usuario(identificacion): recorre toda la lista con for — O(n)
+Semana 12 → acceso directo al dict — O(1)
+Semana 11 → registrar_usuario (validar unicidad): llama a buscar_usuario que recorre la lista
+Semana 12 → comprobación `in` sobre el dict — O(1)
 
-* **Carga de datos:** Al iniciar `main.py`, se invoca el método `cargar_productos()`. Mediante `with open()` y `json.load()`, se lee el archivo `productos.json`, se validan los registros y se reconstruyen como objetos `Producto` válidos que se cargan en la memoria del restaurante.
-* **Guardado de datos:** Cada vez que el usuario realiza una operación de escritura (Registrar, Actualizar o Eliminar un producto), el sistema llama automáticamente al método `guardar_productos()`. Los objetos se convierten a diccionarios y se guardan en el archivo usando `json.dump()` con codificación UTF-8, asegurando que el archivo siempre esté sincronizado con la memoria.
-
----
-
-# Estructuras de datos utilizadas
-
-* **Lista (list):** Almacena las colecciones dinámicas de productos y usuarios (`self.productos`, `self.usuarios`).
-* **Tupla (tuple):** Almacena de forma inmutable las opciones del menú principal (`OPCIONES_MENU`).
-* **Diccionario (dict):** Asocia cada opción del menú con la función que ejecuta la operación correspondiente (`ACCIONES`).
-* **Conjunto (set):** Se utiliza para obtener y mostrar las categorías de productos evitando elementos duplicados.
+Colección auxiliar: _indice_usuarios: dict[str, Usuario]
+Clave: identificación del usuario
+Valor: referencia al objeto Usuario
 
 ---
 
-# Manejo de Excepciones
+### 3. Ventas agrupadas por usuario — dict de listas
 
-Para garantizar la estabilidad del sistema, se controlan múltiples excepciones, especialmente durante la manipulación de archivos:
+Semana 11 → consultar_ventas_usuario(id): recorre todas las ventas con for — O(n)
+Semana 12 → acceso directo a la lista del usuario — O(1)
 
-* **`FileNotFoundError`:** Si `productos.json` no existe al iniciar, el sistema lo notifica y arranca con una lista vacía sin detenerse.
-* **`json.JSONDecodeError`:** Captura errores si el archivo JSON está dañado o vacío inicialmente.
-* **`PermissionError`:** Avisa si no hay permisos de lectura o escritura en el directorio.
-* **`KeyError` y `ValueError`:** Valida que los datos leídos del JSON estén completos y cumplan con las reglas de negocio (ej. precios mayores a cero) al reconstruir los objetos, omitiendo registros corruptos sin cerrar la aplicación.
+Colección auxiliar: _ventas_por_usuario: dict[str, list[Venta]]
+Clave: identificación del usuario
+Valor: lista de objetos Venta asociados
 
 ---
 
-# Ejecución y Pruebas
+### 4. Categorías únicas — set
 
-Para ejecutar el programa, asegúrese de estar en el directorio raíz del proyecto y ejecute:
+Semana 11 → obtener_categorias(): generaba un set recorriendo la lista en cada llamada
+Semana 12 → retorna _categorias ya mantenido — O(1)
 
-```bash
+Colección auxiliar: _categorias: set[str]
+Se actualiza al registrar, actualizar o eliminar productos.
+
+---
+
+## Sincronización y reconstrucción de índices
+
+Al iniciar el programa: los setters de restaurante.productos, restaurante.usuarios y restaurante.ventas invocan métodos de reconstrucción (_reconstruir_indices_productos, _reconstruir_indice_usuarios, _reconstruir_ventas_por_usuario) que recrean todos los índices a partir de los objetos cargados desde JSON.
+
+En cada operación (registrar, actualizar, eliminar, vender): los índices se actualizan de forma inmediata para mantener coherencia con las listas principales.
+
+---
+
+## Colecciones y su responsabilidad
+
+_productos        → list                  → Almacenar, recorrer, listar y persistir productos
+_usuarios         → list                  → Almacenar, recorrer, listar y persistir usuarios
+_ventas           → list                  → Almacenar, recorrer, listar y persistir ventas
+_indice_productos → dict[str, Producto]   → Búsqueda y validación de unicidad por código
+_indice_usuarios  → dict[str, Usuario]    → Búsqueda y validación de unicidad por identificación
+_ventas_por_usuario → dict[str, list]     → Consulta de ventas agrupadas por usuario
+_categorias       → set[str]              → Categorías únicas sin recorrido adicional
+
+---
+
+## Ejecución
+
+cd restaurante_app
 python main.py
 
-```
+Requiere Python 3.10 o superior.
 
-**Evidencia de pruebas de persistencia:**
-Se comprobó satisfactoriamente la persistencia de datos cerrando y reiniciando el programa. Al agregar nuevos productos, salir de la aplicación (Opción 9) y volver a ejecutar `main.py`, el sistema recuperó con éxito toda la información guardada en `productos.json`, listando los productos previamente registrados sin ninguna pérdida de datos.
+---
 
+## Opciones del menú
 
-# Reflexión
+1.  Registrar producto
+2.  Buscar producto
+3.  Actualizar producto
+4.  Eliminar producto
+5.  Listar productos
+6.  Registrar usuario
+7.  Listar usuarios
+8.  Mostrar categorías
+9.  Registrar venta
+10. Listar ventas
+11. Consultar ventas por usuario
+12. Salir
 
-Durante el desarrollo de esta actividad fue posible evolucionar un proyecto modular en Python incorporando persistencia de datos mediante archivos JSON. Se logró separar las responsabilidades creando un servicio específico para el manejo de archivos sin romper la arquitectura existente. El uso robusto del manejo de excepciones asegura que el programa sea resiliente ante errores externos, demostrando cómo construir aplicaciones más estructuradas, seguras y funcionales a largo plazo.
+---
+
+## Pruebas realizadas
+
+1. Carga inicial: se ejecuta el programa y se verifican los 9 productos, 5 usuarios y 12 ventas del JSON; los índices se reconstruyen automáticamente.
+2. Buscar producto por código: se ingresa P001 y se obtiene la información sin recorrer la lista.
+3. Buscar usuario por identificación: se ingresa 0901234567 y se obtiene el usuario directamente.
+4. Registrar venta: se vende un producto a un usuario; el stock disminuye y la venta queda en _ventas_por_usuario.
+5. Consultar ventas por usuario (opción 11): devuelve solo las ventas del usuario indicado en O(1).
+6. Eliminar producto: el índice y el set de categorías quedan actualizados.
+7. Reinicio: se cierra y vuelve a ejecutar el programa; los datos JSON se recuperan y los índices se reconstruyen correctamente.
