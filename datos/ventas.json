@@ -1,1 +1,62 @@
-[]
+[
+    {
+        "usuario_id": "0901234567",
+        "producto_codigo": "P001",
+        "cantidad": 2
+    },
+    {
+        "usuario_id": "0901234567",
+        "producto_codigo": "B001",
+        "cantidad": 3
+    },
+    {
+        "usuario_id": "0912345678",
+        "producto_codigo": "P002",
+        "cantidad": 1
+    },
+    {
+        "usuario_id": "0912345678",
+        "producto_codigo": "PST001",
+        "cantidad": 2
+    },
+    {
+        "usuario_id": "0923456789",
+        "producto_codigo": "P003",
+        "cantidad": 1
+    },
+    {
+        "usuario_id": "0923456789",
+        "producto_codigo": "B002",
+        "cantidad": 2
+    },
+    {
+        "usuario_id": "0923456789",
+        "producto_codigo": "PST002",
+        "cantidad": 1
+    },
+    {
+        "usuario_id": "0934567890",
+        "producto_codigo": "P004",
+        "cantidad": 2
+    },
+    {
+        "usuario_id": "0934567890",
+        "producto_codigo": "B003",
+        "cantidad": 1
+    },
+    {
+        "usuario_id": "0945678901",
+        "producto_codigo": "P001",
+        "cantidad": 1
+    },
+    {
+        "usuario_id": "0945678901",
+        "producto_codigo": "B001",
+        "cantidad": 2
+    },
+    {
+        "usuario_id": "0945678901",
+        "producto_codigo": "PST001",
+        "cantidad": 1
+    }
+]
