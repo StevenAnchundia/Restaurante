@@ -1,4 +1,3 @@
-
 class Producto:
     """
     Clase que representa un producto del restaurante.
@@ -19,7 +18,7 @@ class Producto:
         self.stock = stock
 
     # Código
-    
+
     @property
     def codigo(self) -> str:
         return self.__codigo
@@ -43,7 +42,7 @@ class Producto:
         self.__nombre = valor
 
     # Categoría
-    
+
     @property
     def categoria(self) -> str:
         return self.__categoria
