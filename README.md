@@ -1,4 +1,4 @@
-# Sistema de Gestión de Restaurante
+# Restaurante App
 
 ## Estudiante
 
@@ -6,135 +6,259 @@
 
 ---
 
-## Descripción general
+# Descripción
 
-Este proyecto es la evolución de `restaurante_app` correspondiente a la **Semana 12** de Programación Orientada a Objetos. Conserva todas las funcionalidades de la Semana 11 (registro de productos, usuarios y ventas, control de stock, persistencia JSON) e incorpora mejoras internas de rendimiento mediante el uso adecuado de colecciones.
+Este proyecto corresponde a la **Semana 13** de la asignatura Programación Orientada a Objetos.
+
+En esta etapa se inicia la transición del proyecto **restaurante_app** desde una aplicación basada en consola hacia una aplicación con **interfaz gráfica utilizando Tkinter**.
+
+La aplicación mantiene la separación entre modelos, servicios, datos y vistas gráficas, permitiendo comprender la organización de una aplicación de escritorio antes de incorporar todas las funcionalidades desarrolladas en semanas anteriores.
+
+En esta versión se implementa una simulación de acceso mediante un Login y una ventana principal desde donde es posible visualizar la información de productos y usuarios cargados desde archivos JSON.
 
 ---
 
-## Estructura del proyecto
+# Estructura del proyecto
 
+```
 restaurante_app/
+│
 ├── datos/
 │   ├── productos.json
-│   ├── usuarios.json
-│   └── ventas.json
+│   └── usuarios.json
+│
 ├── modelos/
 │   ├── __init__.py
 │   ├── producto.py
-│   ├── usuario.py
-│   └── venta.py
+│   └── usuario.py
+│
 ├── servicios/
 │   ├── __init__.py
 │   ├── archivo_servicio.py
-│   └── restaurante.py
-└── main.py
+│   └── restaurante_servicio.py
+│
+├── ui/
+│   ├── __init__.py
+│   ├── login_view.py
+│   └── main_view.py
+│
+├── main.py
+│
+└── README.md
+```
 
 ---
 
-## Mejoras de rendimiento aplicadas (Semana 12)
+# Organización del proyecto
 
-Las mejoras se implementaron íntegramente dentro de `servicios/restaurante.py`, sin trasladar responsabilidades a `main.py`.
+## datos/
 
-### 1. Índice de productos — dict por código
+Contiene los archivos JSON utilizados como almacenamiento local de la aplicación.
 
-Semana 11 → buscar_producto(codigo): recorre toda la lista con for — O(n)
-Semana 12 → acceso directo al dict — O(1)
-Semana 11 → registrar_producto (validar unicidad): llama a buscar_producto que recorre la lista
-Semana 12 → comprobación `in` sobre el dict — O(1)
-
-Colección auxiliar: _indice_productos: dict[str, Producto]
-Clave: código del producto
-Valor: referencia al objeto Producto
+- productos.json
+- usuarios.json
 
 ---
 
-### 2. Índice de usuarios — dict por identificación
+## modelos/
 
-Semana 11 → buscar_usuario(identificacion): recorre toda la lista con for — O(n)
-Semana 12 → acceso directo al dict — O(1)
-Semana 11 → registrar_usuario (validar unicidad): llama a buscar_usuario que recorre la lista
-Semana 12 → comprobación `in` sobre el dict — O(1)
+Representa las entidades principales del sistema.
 
-Colección auxiliar: _indice_usuarios: dict[str, Usuario]
-Clave: identificación del usuario
-Valor: referencia al objeto Usuario
+### Producto
 
----
+Representa cada producto del restaurante.
 
-### 3. Ventas agrupadas por usuario — dict de listas
+Contiene información como:
 
-Semana 11 → consultar_ventas_usuario(id): recorre todas las ventas con for — O(n)
-Semana 12 → acceso directo a la lista del usuario — O(1)
+- código
+- nombre
+- categoría
+- precio
+- stock
 
-Colección auxiliar: _ventas_por_usuario: dict[str, list[Venta]]
-Clave: identificación del usuario
-Valor: lista de objetos Venta asociados
+### Usuario
+
+Representa los usuarios utilizados para la simulación del acceso al sistema.
 
 ---
 
-### 4. Categorías únicas — set
+## servicios/
 
-Semana 11 → obtener_categorias(): generaba un set recorriendo la lista en cada llamada
-Semana 12 → retorna _categorias ya mantenido — O(1)
+Contiene la lógica del sistema.
 
-Colección auxiliar: _categorias: set[str]
-Se actualiza al registrar, actualizar o eliminar productos.
+### ArchivoServicio
 
----
+Es el encargado de leer los archivos JSON y convertir la información almacenada en objetos del sistema.
 
-## Sincronización y reconstrucción de índices
+### RestauranteServicio
 
-Al iniciar el programa: los setters de restaurante.productos, restaurante.usuarios y restaurante.ventas invocan métodos de reconstrucción (_reconstruir_indices_productos, _reconstruir_indice_usuarios, _reconstruir_ventas_por_usuario) que recrean todos los índices a partir de los objetos cargados desde JSON.
+Gestiona las operaciones principales de la aplicación como:
 
-En cada operación (registrar, actualizar, eliminar, vender): los índices se actualizan de forma inmediata para mantener coherencia con las listas principales.
+- validar acceso
+- obtener productos
+- obtener usuarios
+- consultar información necesaria para las vistas
 
----
-
-## Colecciones y su responsabilidad
-
-_productos        → list                  → Almacenar, recorrer, listar y persistir productos
-_usuarios         → list                  → Almacenar, recorrer, listar y persistir usuarios
-_ventas           → list                  → Almacenar, recorrer, listar y persistir ventas
-_indice_productos → dict[str, Producto]   → Búsqueda y validación de unicidad por código
-_indice_usuarios  → dict[str, Usuario]    → Búsqueda y validación de unicidad por identificación
-_ventas_por_usuario → dict[str, list]     → Consulta de ventas agrupadas por usuario
-_categorias       → set[str]              → Categorías únicas sin recorrido adicional
+Las vistas no leen directamente los archivos JSON.
 
 ---
 
-## Ejecución
+## ui/
 
+Contiene todas las ventanas construidas con Tkinter.
+
+### LoginView
+
+Es la primera ventana que visualiza el usuario.
+
+Permite ingresar:
+
+- usuario
+- contraseña
+
+Valida las credenciales mediante RestauranteServicio.
+
+Si los datos son incorrectos muestra un mensaje de error.
+
+---
+
+### MainView
+
+Se muestra únicamente cuando el acceso es correcto.
+
+Permite visualizar:
+
+- Productos registrados
+- Usuarios registrados
+
+Además presenta la opción **Ventas**, la cual queda identificada como una funcionalidad pendiente para las siguientes semanas del proyecto.
+
+---
+
+# Flujo de funcionamiento
+
+```
+Inicio
+
+↓
+
+main.py
+
+↓
+
+Carga de datos
+
+↓
+
+LoginView
+
+↓
+
+Validación de usuario
+
+↓
+
+MainView
+
+↓
+
+Visualizar productos
+
+↓
+
+Visualizar usuarios
+
+↓
+
+Cerrar sesión
+
+↓
+
+LoginView
+```
+
+---
+
+# Funcionalidades implementadas
+
+✔ Inicio mediante una única ventana Tkinter.
+
+✔ Pantalla de acceso.
+
+✔ Validación de usuario y contraseña.
+
+✔ Mensajes para credenciales incorrectas.
+
+✔ Cambio entre Login y ventana principal.
+
+✔ Visualización de productos.
+
+✔ Visualización de usuarios.
+
+✔ Lectura de datos desde archivos JSON.
+
+✔ Separación entre modelos, servicios y vistas.
+
+---
+
+# Funcionalidades pendientes
+
+Como parte de la evolución del proyecto durante las siguientes semanas todavía no se implementan gráficamente:
+
+- Registro de productos
+- Actualización de productos
+- Eliminación de productos
+- Registro de usuarios
+- Registro de ventas
+- Control de stock desde la interfaz
+- Persistencia de cambios mediante la interfaz gráfica
+
+Estas funcionalidades se incorporarán progresivamente conforme avance la asignatura.
+
+---
+
+# Ejecución
+
+Ubicarse dentro del proyecto:
+
+```bash
 cd restaurante_app
+```
+
+Ejecutar:
+
+```bash
 python main.py
-
-Requiere Python 3.10 o superior.
-
----
-
-## Opciones del menú
-
-1.  Registrar producto
-2.  Buscar producto
-3.  Actualizar producto
-4.  Eliminar producto
-5.  Listar productos
-6.  Registrar usuario
-7.  Listar usuarios
-8.  Mostrar categorías
-9.  Registrar venta
-10. Listar ventas
-11. Consultar ventas por usuario
-12. Salir
+```
 
 ---
 
-## Pruebas realizadas
+# Requisitos
 
-1. Carga inicial: se ejecuta el programa y se verifican los 9 productos, 5 usuarios y 12 ventas del JSON; los índices se reconstruyen automáticamente.
-2. Buscar producto por código: se ingresa P001 y se obtiene la información sin recorrer la lista.
-3. Buscar usuario por identificación: se ingresa 0901234567 y se obtiene el usuario directamente.
-4. Registrar venta: se vende un producto a un usuario; el stock disminuye y la venta queda en _ventas_por_usuario.
-5. Consultar ventas por usuario (opción 11): devuelve solo las ventas del usuario indicado en O(1).
-6. Eliminar producto: el índice y el set de categorías quedan actualizados.
-7. Reinicio: se cierra y vuelve a ejecutar el programa; los datos JSON se recuperan y los índices se reconstruyen correctamente.
+- Python 3.10 o superior
+- Tkinter (incluido en la instalación estándar de Python)
+
+---
+
+# Pruebas realizadas
+
+Se verificó el siguiente flujo de funcionamiento:
+
+1. La aplicación inicia sin errores.
+2. Se muestra la pantalla Login.
+3. Los campos vacíos generan un mensaje de advertencia.
+4. Las credenciales incorrectas muestran un mensaje de error.
+5. Las credenciales válidas permiten ingresar al sistema.
+6. La ventana principal muestra correctamente los productos cargados desde productos.json.
+7. La ventana principal muestra correctamente los usuarios cargados desde usuarios.json.
+8. La información es obtenida mediante RestauranteServicio.
+9. La opción Cerrar sesión regresa nuevamente a la pantalla Login utilizando la misma ventana principal.
+
+---
+
+# Tecnologías utilizadas
+
+- Python
+- Programación Orientada a Objetos
+- Tkinter
+- JSON
