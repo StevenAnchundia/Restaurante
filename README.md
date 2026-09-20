@@ -8,44 +8,44 @@
 
 # Descripción
 
-Este proyecto corresponde a la **Semana 13** de la asignatura Programación Orientada a Objetos.
+Este proyecto corresponde a la **Semana 14** de la asignatura Programación Orientada a Objetos.
 
-En esta etapa se inicia la transición del proyecto **restaurante_app** desde una aplicación basada en consola hacia una aplicación con **interfaz gráfica utilizando Tkinter**.
+En esta etapa se continúa la evolución del proyecto **restaurante_app**, incorporando mejoras en la interfaz gráfica mediante el uso de **componentes, contenedores y gestores de geometría de Tkinter**.
 
-La aplicación mantiene la separación entre modelos, servicios, datos y vistas gráficas, permitiendo comprender la organización de una aplicación de escritorio antes de incorporar todas las funcionalidades desarrolladas en semanas anteriores.
+La aplicación mantiene la separación entre modelos, servicios, datos y vistas gráficas, permitiendo una mejor organización del sistema y evitando concentrar la lógica del negocio dentro de la interfaz.
 
-En esta versión se implementa una simulación de acceso mediante un Login y una ventana principal desde donde es posible visualizar la información de productos y usuarios cargados desde archivos JSON.
+En esta versión se implementa una interfaz principal para la gestión de productos, permitiendo registrar, consultar, actualizar y eliminar productos mediante componentes gráficos, manteniendo la persistencia de información mediante archivos JSON.
 
 ---
 
 # Estructura del proyecto
 
-```
+
 restaurante_app/
 │
 ├── datos/
-│   ├── productos.json
-│   └── usuarios.json
+│ ├── productos.json
+│ └── usuarios.json
 │
 ├── modelos/
-│   ├── __init__.py
-│   ├── producto.py
-│   └── usuario.py
+│ ├── init.py
+│ ├── producto.py
+│ └── usuario.py
 │
 ├── servicios/
-│   ├── __init__.py
-│   ├── archivo_servicio.py
-│   └── restaurante_servicio.py
+│ ├── init.py
+│ ├── archivo_servicio.py
+│ └── restaurante_servicio.py
 │
 ├── ui/
-│   ├── __init__.py
-│   ├── login_view.py
-│   └── main_view.py
+│ ├── init.py
+│ ├── login_view.py
+│ └── main_view.py
 │
 ├── main.py
 │
 └── README.md
-```
+
 
 ---
 
@@ -78,66 +78,97 @@ Contiene información como:
 
 ### Usuario
 
-Representa los usuarios utilizados para la simulación del acceso al sistema.
+Representa los usuarios registrados dentro del sistema.
 
 ---
 
 ## servicios/
 
-Contiene la lógica del sistema.
+Contiene la lógica del sistema y las operaciones principales.
 
 ### ArchivoServicio
 
-Es el encargado de leer los archivos JSON y convertir la información almacenada en objetos del sistema.
+Es el encargado de leer y escribir los archivos JSON, realizando la conversión entre información almacenada y objetos utilizados por la aplicación.
 
 ### RestauranteServicio
 
-Gestiona las operaciones principales de la aplicación como:
+Gestiona las operaciones principales del sistema como:
 
 - validar acceso
 - obtener productos
 - obtener usuarios
-- consultar información necesaria para las vistas
+- registrar productos
+- consultar productos
+- actualizar productos
+- eliminar productos
 
-Las vistas no leen directamente los archivos JSON.
+Las vistas no realizan lectura ni escritura directa sobre los archivos JSON, manteniendo la separación de responsabilidades.
 
 ---
 
 ## ui/
 
-Contiene todas las ventanas construidas con Tkinter.
+Contiene las ventanas construidas mediante Tkinter.
 
 ### LoginView
 
-Es la primera ventana que visualiza el usuario.
+Es la primera ventana visualizada por el usuario.
 
 Permite ingresar:
 
 - usuario
 - contraseña
 
-Valida las credenciales mediante RestauranteServicio.
+La validación de acceso se realiza mediante RestauranteServicio.
 
-Si los datos son incorrectos muestra un mensaje de error.
+Si las credenciales son correctas permite ingresar a la ventana principal del sistema.
 
 ---
 
 ### MainView
 
-Se muestra únicamente cuando el acceso es correcto.
+Es la ventana principal de la aplicación.
 
-Permite visualizar:
+Utiliza componentes y contenedores de Tkinter para organizar la interfaz gráfica.
 
-- Productos registrados
-- Usuarios registrados
+Permite:
 
-Además presenta la opción **Ventas**, la cual queda identificada como una funcionalidad pendiente para las siguientes semanas del proyecto.
+- Registrar productos.
+- Consultar productos mediante código.
+- Actualizar información de productos.
+- Eliminar productos.
+- Visualizar productos registrados mediante una tabla.
+- Consultar usuarios registrados.
+
+Las operaciones realizadas desde la interfaz son procesadas mediante RestauranteServicio.
+
+---
+
+# Componentes y contenedores utilizados
+
+Para la construcción de la interfaz gráfica se utilizaron componentes de Tkinter y ttk:
+
+- Frame: utilizado para organizar las diferentes zonas de la aplicación.
+- LabelFrame: utilizado para separar visualmente las secciones del sistema.
+- Label: utilizado para mostrar información.
+- Entry: utilizado para capturar datos de productos.
+- Button: utilizado para ejecutar acciones mediante el parámetro command=.
+- Treeview: utilizado para mostrar productos en forma de tabla.
+- Scrollbar: utilizado para facilitar la navegación dentro de la tabla.
+- Listbox: utilizado para mostrar usuarios registrados.
+
+Los gestores de geometría utilizados fueron:
+
+- pack()
+- grid()
+
+Estos permiten distribuir correctamente los componentes dentro de los contenedores y mejorar la organización visual de la aplicación.
 
 ---
 
 # Flujo de funcionamiento
 
-```
+
 Inicio
 
 ↓
@@ -146,7 +177,7 @@ main.py
 
 ↓
 
-Carga de datos
+Carga de servicios y datos JSON
 
 ↓
 
@@ -154,7 +185,7 @@ LoginView
 
 ↓
 
-Validación de usuario
+Validación mediante RestauranteServicio
 
 ↓
 
@@ -162,58 +193,76 @@ MainView
 
 ↓
 
-Visualizar productos
+Gestión de productos y consulta de usuarios
 
 ↓
 
-Visualizar usuarios
+Operaciones CRUD
 
 ↓
 
-Cerrar sesión
+Actualización de productos.json
 
 ↓
 
-LoginView
-```
+Actualización de información mostrada
+
 
 ---
 
 # Funcionalidades implementadas
 
-✔ Inicio mediante una única ventana Tkinter.
+✔ Inicio mediante interfaz gráfica Tkinter.
 
-✔ Pantalla de acceso.
+✔ Pantalla de acceso mediante LoginView.
 
 ✔ Validación de usuario y contraseña.
 
-✔ Mensajes para credenciales incorrectas.
+✔ Separación entre modelos, servicios, datos e interfaz.
 
-✔ Cambio entre Login y ventana principal.
+✔ Organización visual mediante componentes y contenedores.
 
-✔ Visualización de productos.
+✔ Registro de productos.
 
-✔ Visualización de usuarios.
+✔ Consulta de productos mediante código.
 
-✔ Lectura de datos desde archivos JSON.
+✔ Actualización de productos existentes.
 
-✔ Separación entre modelos, servicios y vistas.
+✔ Eliminación de productos.
+
+✔ Visualización de productos mediante Treeview.
+
+✔ Consulta de usuarios registrados.
+
+✔ Uso de botones mediante command=.
+
+✔ Persistencia de información mediante productos.json.
+
+✔ Actualización automática de la información mostrada después de cada operación.
 
 ---
 
 # Funcionalidades pendientes
 
-Como parte de la evolución del proyecto durante las siguientes semanas todavía no se implementan gráficamente:
+Como parte de futuras mejoras del proyecto se pueden incorporar:
 
-- Registro de productos
-- Actualización de productos
-- Eliminación de productos
-- Registro de usuarios
-- Registro de ventas
-- Control de stock desde la interfaz
-- Persistencia de cambios mediante la interfaz gráfica
+- Gestión completa de ventas.
+- Control avanzado de inventario.
+- Nuevas mejoras visuales.
+- Nuevos módulos administrativos.
 
-Estas funcionalidades se incorporarán progresivamente conforme avance la asignatura.
+---
+
+# Persistencia de información
+
+La información del sistema se mantiene mediante archivos JSON:
+
+
+datos/productos.json
+datos/usuarios.json
+
+
+La lectura y escritura de archivos se realiza únicamente mediante ArchivoServicio, evitando manipular directamente los archivos desde la interfaz gráfica.
 
 ---
 
@@ -223,42 +272,41 @@ Ubicarse dentro del proyecto:
 
 ```bash
 cd restaurante_app
-```
 
 Ejecutar:
 
-```bash
 python main.py
-```
 
----
+Credenciales de acceso:
 
-# Requisitos
+Usuario:
 
-- Python 3.10 o superior
-- Tkinter (incluido en la instalación estándar de Python)
+admin
 
----
+Contraseña:
 
-# Pruebas realizadas
+1234
+Pruebas realizadas
 
-Se verificó el siguiente flujo de funcionamiento:
+Se verificó el siguiente funcionamiento:
 
-1. La aplicación inicia sin errores.
-2. Se muestra la pantalla Login.
-3. Los campos vacíos generan un mensaje de advertencia.
-4. Las credenciales incorrectas muestran un mensaje de error.
-5. Las credenciales válidas permiten ingresar al sistema.
-6. La ventana principal muestra correctamente los productos cargados desde productos.json.
-7. La ventana principal muestra correctamente los usuarios cargados desde usuarios.json.
-8. La información es obtenida mediante RestauranteServicio.
-9. La opción Cerrar sesión regresa nuevamente a la pantalla Login utilizando la misma ventana principal.
-
----
-
-# Tecnologías utilizadas
-
-- Python
-- Programación Orientada a Objetos
-- Tkinter
-- JSON
+La aplicación inicia correctamente desde main.py.
+El Login permite validar credenciales.
+Los campos vacíos muestran mensajes de advertencia.
+Las credenciales incorrectas muestran mensajes de error.
+El acceso correcto permite ingresar a MainView.
+La interfaz muestra correctamente los productos cargados desde productos.json.
+La interfaz muestra correctamente los usuarios registrados desde usuarios.json.
+Se puede registrar un nuevo producto.
+Se puede consultar un producto mediante su código.
+Se puede actualizar la información de un producto.
+Se puede eliminar un producto.
+Los cambios realizados se guardan correctamente en productos.json.
+Después de reiniciar la aplicación, la información permanece disponible.
+La interfaz solicita las operaciones mediante RestauranteServicio sin manipular directamente los archivos JSON.
+Tecnologías utilizadas
+Python
+Programación Orientada a Objetos
+Tkinter / ttk
+Archivos JSON
+GitHub
