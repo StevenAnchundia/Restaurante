@@ -22,37 +22,38 @@ En esta versión se implementa una interfaz principal para la gestión de produc
 
 
 restaurante_app/
+
 │
 ├── datos/
 
-│ ├────  productos.json
+│  ├────  productos.json
 
-│ └────  usuarios.json
+│  └────  usuarios.json
 
 │
 ├── modelos/
 
-│ ├────  init.py
+│  ├────  init.py
 
-│ ├────  producto.py
+│  ├────  producto.py
 
-│ └────  usuario.py
+│  └────  usuario.py
 │
 ├── servicios/
 
-│ ├────  init.py
+│  ├────  init.py
 
-│ ├────  archivo_servicio.py
+│  ├────  archivo_servicio.py
 
-│ └────  restaurante_servicio.py
+│  └────  restaurante_servicio.py
 │
 ├── ui/
 
-│ ├────  init.py
+│  ├────  init.py
+ 
+│  ├────  login_view.py
 
-│ ├────  login_view.py
-
-│ └────  main_view.py
+│  └────  main_view.py
 
 │
 ├── main.py
