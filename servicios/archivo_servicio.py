@@ -9,8 +9,19 @@ class ArchivoServicio:
 
     def __init__(self):
 
-        carpeta_base = os.path.dirname(os.path.dirname(__file__))
-        carpeta_datos = os.path.join(carpeta_base, "datos")
+        carpeta_base = os.path.dirname(
+            os.path.dirname(__file__)
+        )
+
+        carpeta_datos = os.path.join(
+            carpeta_base,
+            "datos"
+        )
+
+        if not os.path.exists(carpeta_datos):
+
+            os.makedirs(carpeta_datos)
+
 
         self.archivo_productos = os.path.join(
             carpeta_datos,
@@ -22,9 +33,10 @@ class ArchivoServicio:
             "usuarios.json"
         )
 
-    # =====================================
+
+    # ==========================
     # PRODUCTOS
-    # =====================================
+    # ==========================
 
     def cargar_productos(self):
 
@@ -36,43 +48,53 @@ class ArchivoServicio:
                 encoding="utf-8"
             ) as archivo:
 
-                datos = json.load(archivo)
+                datos = json.load(
+                    archivo
+                )
 
             productos = []
 
-            for p in datos:
+            for producto in datos:
 
                 productos.append(
 
                     Producto(
-                        p["codigo"],
-                        p["nombre"],
-                        p["categoria"],
-                        p["precio"],
-                        p["stock"]
+                        producto["codigo"],
+                        producto["nombre"],
+                        producto["categoria"],
+                        producto["precio"],
+                        producto["stock"]
                     )
 
                 )
 
             return productos
 
-        except FileNotFoundError:
+        except (
+            FileNotFoundError,
+            json.JSONDecodeError
+        ):
 
             return []
 
     def guardar_productos(self, productos):
 
+
         datos = []
+
 
         for producto in productos:
 
-            datos.append(producto.to_dict())
+            datos.append(
+                producto.to_dict()
+            )
 
         with open(
             self.archivo_productos,
             "w",
             encoding="utf-8"
         ) as archivo:
+
 
             json.dump(
                 datos,
@@ -81,11 +103,13 @@ class ArchivoServicio:
                 ensure_ascii=False
             )
 
-    # =====================================
+
+    # ==========================
     # USUARIOS
-    # =====================================
+    # ==========================
 
     def cargar_usuarios(self):
+
 
         try:
 
@@ -95,24 +119,32 @@ class ArchivoServicio:
                 encoding="utf-8"
             ) as archivo:
 
-                datos = json.load(archivo)
+
+                datos = json.load(
+                    archivo
+                )
+
+
 
             usuarios = []
 
-            for u in datos:
+            for usuario in datos:
 
                 usuarios.append(
 
                     Usuario(
-                        u["identificacion"],
-                        u["nombre"],
-                        u["correo"]
+                        usuario["identificacion"],
+                        usuario["nombre"],
+                        usuario["correo"]
                     )
 
                 )
 
             return usuarios
 
-        except FileNotFoundError:
+        except (
+            FileNotFoundError,
+            json.JSONDecodeError
+        ):
 
             return []
