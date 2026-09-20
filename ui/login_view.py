@@ -1,100 +1,87 @@
-
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 
 
 class LoginView:
 
-    def __init__(self, root, restaurante_servicio):
+    def __init__(self, root, servicio, mostrar_main):
 
         self.root = root
-        self.restaurante_servicio = restaurante_servicio
+        self.servicio = servicio
+        self.mostrar_main = mostrar_main
 
-        self.on_login = None
+        self.frame = ttk.Frame(self.root, padding=30)
+        self.frame.pack(fill="both", expand=True)
 
-        self.frame = tk.Frame(root)
-
-        self.crear_componentes()
-
-    def crear_componentes(self):
-
-        titulo = tk.Label(
+        titulo = ttk.Label(
             self.frame,
             text="RESTAURANTE APP",
             font=("Arial", 18, "bold")
         )
+        titulo.pack(pady=10)
 
-        titulo.pack(pady=15)
+        subtitulo = ttk.Label(
+            self.frame,
+            text="Inicio de sesión"
+        )
+        subtitulo.pack(pady=5)
 
-        tk.Label(
+        ttk.Label(
             self.frame,
             text="Usuario"
-        ).pack()
+        ).pack(pady=(15, 0))
 
-        self.entry_usuario = tk.Entry(
+        self.entry_usuario = ttk.Entry(
             self.frame,
             width=30
         )
+        self.entry_usuario.pack()
 
-        self.entry_usuario.pack(pady=5)
-
-        tk.Label(
+        ttk.Label(
             self.frame,
             text="Contraseña"
-        ).pack()
+        ).pack(pady=(15, 0))
 
-        self.entry_clave = tk.Entry(
+        self.entry_clave = ttk.Entry(
             self.frame,
             show="*",
             width=30
         )
+        self.entry_clave.pack()
 
-        self.entry_clave.pack(pady=5)
-
-        boton = tk.Button(
+        ttk.Button(
             self.frame,
             text="Ingresar",
-            command=self.iniciar_sesion
-        )
+            command=self.ingresar
+        ).pack(pady=20)
 
-        boton.pack(pady=20)
-
-    def mostrar(self):
-
-        self.frame.pack(expand=True)
-
-    def ocultar(self):
-
-        self.frame.pack_forget()
-
-    def iniciar_sesion(self):
+    def ingresar(self):
 
         usuario = self.entry_usuario.get()
-
         clave = self.entry_clave.get()
 
         if usuario == "" or clave == "":
 
             messagebox.showwarning(
-                "Campos vacíos",
-                "Ingrese usuario y contraseña."
+                "Advertencia",
+                "Debe completar todos los campos."
             )
 
             return
 
-        valido = self.restaurante_servicio.validar_login(
+        if self.servicio.validar_login(
             usuario,
             clave
-        )
+        ):
 
-        if valido:
+            self.frame.destroy()
 
-            if self.on_login:
-                self.on_login()
+            self.mostrar_main()
 
         else:
 
             messagebox.showerror(
                 "Error",
-                "Credenciales incorrectas."
+                "Usuario o contraseña incorrectos."
             )
