@@ -3,78 +3,48 @@ import os
 
 from modelos.producto import Producto
 from modelos.usuario import Usuario
-from modelos.venta import Venta
 
 
 class ArchivoServicio:
 
     def __init__(self):
 
-        self.carpeta = "datos"
+        carpeta_base = os.path.dirname(os.path.dirname(__file__))
+        carpeta_datos = os.path.join(carpeta_base, "datos")
 
-        os.makedirs(self.carpeta, exist_ok=True)
-
-        self.productos_archivo = os.path.join(
-            self.carpeta,
+        self.archivo_productos = os.path.join(
+            carpeta_datos,
             "productos.json"
         )
 
-        self.usuarios_archivo = os.path.join(
-            self.carpeta,
+        self.archivo_usuarios = os.path.join(
+            carpeta_datos,
             "usuarios.json"
         )
 
-        self.ventas_archivo = os.path.join(
-            self.carpeta,
-            "ventas.json"
-        )
-
-    # ==========================================
+    # =====================================
     # PRODUCTOS
-    # ==========================================
-
-    def guardar_productos(self, productos):
-
-        try:
-
-            datos = []
-
-            for producto in productos:
-                datos.append(producto.to_dict())
-
-            with open(
-                self.productos_archivo,
-                "w",
-                encoding="utf-8"
-            ) as archivo:
-
-                json.dump(
-                    datos,
-                    archivo,
-                    indent=4,
-                    ensure_ascii=False
-                )
-
-        except PermissionError:
-            print("No se pudo guardar productos.json")
+    # =====================================
 
     def cargar_productos(self):
 
         try:
 
             with open(
-                self.productos_archivo,
+                self.archivo_productos,
                 "r",
                 encoding="utf-8"
             ) as archivo:
 
                 datos = json.load(archivo)
 
-                productos = []
+            productos = []
 
-                for p in datos:
+            for p in datos:
 
-                    producto = Producto(
+                productos.append(
+
+                    Producto(
                         p["codigo"],
                         p["nombre"],
                         p["categoria"],
@@ -82,149 +52,67 @@ class ArchivoServicio:
                         p["stock"]
                     )
 
-                    productos.append(producto)
-
-                return productos
-
-        except FileNotFoundError:
-            return []
-
-        except json.JSONDecodeError:
-            print("productos.json está dañado.")
-            return []
-
-        except KeyError:
-            print("Error en las claves de productos.json")
-            return []
-
-    # ==========================================
-    # USUARIOS
-    # ==========================================
-
-    def guardar_usuarios(self, usuarios):
-
-        try:
-
-            datos = []
-
-            for usuario in usuarios:
-                datos.append(usuario.to_dict())
-
-            with open(
-                self.usuarios_archivo,
-                "w",
-                encoding="utf-8"
-            ) as archivo:
-
-                json.dump(
-                    datos,
-                    archivo,
-                    indent=4,
-                    ensure_ascii=False
                 )
 
-        except PermissionError:
-            print("No fue posible guardar usuarios.")
+            return productos
+
+        except FileNotFoundError:
+
+            return []
+
+    def guardar_productos(self, productos):
+
+        datos = []
+
+        for producto in productos:
+
+            datos.append(producto.to_dict())
+
+        with open(
+            self.archivo_productos,
+            "w",
+            encoding="utf-8"
+        ) as archivo:
+
+            json.dump(
+                datos,
+                archivo,
+                indent=4,
+                ensure_ascii=False
+            )
+
+    # =====================================
+    # USUARIOS
+    # =====================================
 
     def cargar_usuarios(self):
 
         try:
 
             with open(
-                self.usuarios_archivo,
+                self.archivo_usuarios,
                 "r",
                 encoding="utf-8"
             ) as archivo:
 
                 datos = json.load(archivo)
 
-                usuarios = []
+            usuarios = []
 
-                for u in datos:
+            for u in datos:
 
-                    usuario = Usuario(
+                usuarios.append(
+
+                    Usuario(
                         u["identificacion"],
                         u["nombre"],
                         u["correo"]
                     )
 
-                    usuarios.append(usuario)
-
-                return usuarios
-
-        except FileNotFoundError:
-            return []
-
-        except json.JSONDecodeError:
-            print("usuarios.json inválido.")
-            return []
-
-        except KeyError:
-            print("Faltan datos en usuarios.json")
-            return []
-
-    # ==========================================
-    # VENTAS
-    # ==========================================
-
-    def guardar_ventas(self, ventas):
-
-        try:
-
-            datos = []
-
-            for venta in ventas:
-                datos.append(venta.to_dict())
-
-            with open(
-                self.ventas_archivo,
-                "w",
-                encoding="utf-8"
-            ) as archivo:
-
-                json.dump(
-                    datos,
-                    archivo,
-                    indent=4,
-                    ensure_ascii=False
                 )
 
-        except PermissionError:
-            print("No fue posible guardar ventas.")
-
-    def cargar_ventas(self):
-
-        try:
-
-            with open(
-                self.ventas_archivo,
-                "r",
-                encoding="utf-8"
-            ) as archivo:
-
-                datos = json.load(archivo)
-
-                ventas = []
-
-                for v in datos:
-
-                    venta = Venta(
-                        v["usuario_id"],
-                        v["producto_codigo"],
-                        v["cantidad"]
-                    )
-
-                    ventas.append(venta)
-
-                return ventas
+            return usuarios
 
         except FileNotFoundError:
-            return []
 
-        except json.JSONDecodeError:
-            print("ventas.json inválido.")
-            return []
-
-        except KeyError:
-            print("Faltan datos en ventas.json")
             return []
