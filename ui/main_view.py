@@ -191,7 +191,8 @@ class MainView:
         self.cargar_productos()
 
         self.cargar_usuarios()
-            def limpiar(self):
+            
+        def limpiar(self):
 
         self.codigo.delete(0,tk.END)
         self.nombre.delete(0,tk.END)
@@ -230,8 +231,8 @@ class MainView:
             self.lista_usuarios.insert(
                 tk.END,
                 f"{usuario.identificacion} - {usuario.nombre}"
-            )
-                def registrar_producto(self):
+            )     
+    def registrar_producto(self):
 
         if self.servicio.registrar_producto(
             self.codigo.get(),
