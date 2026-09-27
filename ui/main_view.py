@@ -6,21 +6,21 @@ import os
 class MainView(tk.Toplevel):
 
     COLORES = {
-        "fondo":         "#f0f4f0",      # verde muy claro / fondo principal
-        "sidebar":       "#2d5a45",      # verde oscuro elegante
-        "sidebar_hover": "#3d7a5f",      # verde medio para hover
-        "panel":         "#ffffff",      # blanco para paneles
-        "panel_borde":   "#d4e8d4",      # verde claro para bordes
-        "acento":        "#4caf82",      # verde menta principal
-        "acento2":       "#ff8c61",      # naranja suave para contraste
-        "acento3":       "#ffd166",      # amarillo cálido
-        "texto":         "#1a2e1a",      # verde muy oscuro / casi negro
-        "texto_suave":   "#6b8f71",      # verde grisáceo
+        "fondo":         "#f0f4f0",     
+        "sidebar":       "#2d5a45",    
+        "sidebar_hover": "#3d7a5f",     
+        "panel":         "#ffffff",     
+        "panel_borde":   "#d4e8d4",    
+        "acento":        "#4caf82",    
+        "acento2":       "#ff8c61",   
+        "acento3":       "#ffd166",
+        "texto":         "#1a2e1a",
+        "texto_suave":   "#6b8f71",
         "texto_blanco":  "#ffffff",
-        "tabla_header":  "#2d5a45",      # mismo que sidebar
-        "tabla_par":     "#f7fbf7",      # verde muy pálido
+        "tabla_header":  "#2d5a45",
+        "tabla_par":     "#f7fbf7",
         "tabla_impar":   "#ffffff",
-        "boton":         "#4caf82",      # verde menta
+        "boton":         "#4caf82",
         "boton_hover":   "#3d9e72",
         "boton_naranja": "#ff8c61",
         "boton_rojo":    "#e05252",
@@ -177,7 +177,7 @@ class MainView(tk.Toplevel):
             tk.Label(cabecera, image=self._iconos["logo"],
                      bg=self.COLORES["sidebar"]).pack()
         else:
-            tk.Label(cabecera, text="🍽",
+            tk.Label(cabecera, text=" ",
                      font=("Segoe UI", 36),
                      bg=self.COLORES["sidebar"],
                      fg=self.COLORES["acento"]).pack()
