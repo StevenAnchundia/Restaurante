@@ -1,146 +1,380 @@
-# RESTAURANTE_APP
+# Restaurante App
 
-Sistema de Gestión de Ventas para Restaurante  
-**Asignatura:** Programación Orientada a Objetos  
-**Semana 15:** Conceptos fundamentales de manejo de eventos
+## Estudiante
 
----
-
-## Descripción
-
-`restaurante_app` es una aplicación de escritorio desarrollada con **Python** y **Tkinter/ttk** que permite gestionar usuarios, productos del menú y ventas de un restaurante. La persistencia se realiza mediante archivos **JSON**, y la arquitectura sigue una separación clara de responsabilidades (modelos, servicios, interfaz).
+**Erick Steven Anchundia Martínez**
 
 ---
 
-## Estructura del proyecto
+# Descripción
+
+Este proyecto corresponde a la **Semana 15** de la asignatura **Programación Orientada a Objetos**.
+
+En esta etapa se continúa la evolución del proyecto **restaurante_app**, incorporando los **conceptos fundamentales de manejo de eventos** mediante el uso de **command=** y **callbacks** en la interfaz gráfica desarrollada con **Tkinter**.
+
+La aplicación mantiene la arquitectura modular implementada en semanas anteriores, conservando la separación entre modelos, servicios, datos y vistas, además de la persistencia de la información mediante archivos JSON.
+
+Como principal mejora de esta versión, se incorpora el módulo **Ventas**, permitiendo registrar una venta sencilla mediante la selección de un usuario y un producto existentes. El proceso es ejecutado mediante un botón asociado a un callback, delegando la lógica del negocio a **RestauranteServicio** y almacenando la información en **ventas.json**.
+
+---
+
+# Estructura del proyecto
 
 ```
 restaurante_app/
+│
+├── assets/
+│   ├── logo.png
+│   ├── producto.png
+│   ├── usuario.png
+│   └── venta.png
+│
 ├── datos/
-│   ├── productos.json       ← Menú del restaurante
-│   ├── usuarios.json        ← Personal del sistema
-│   └── ventas.json          ← Historial de ventas (Semana 15)
+│   ├── productos.json
+│   ├── usuarios.json
+│   └── ventas.json
+│
 ├── modelos/
 │   ├── __init__.py
-│   ├── producto.py          ← Modelo Producto
-│   ├── usuario.py           ← Modelo Usuario
-│   └── venta.py             ← Modelo Venta (Semana 15)
+│   ├── producto.py
+│   ├── usuario.py
+│   └── venta.py
+│
 ├── servicios/
 │   ├── __init__.py
-│   ├── archivo_servicio.py  ← Capa de acceso a datos JSON
-│   └── restaurante_servicio.py ← Lógica de negocio y validaciones
+│   ├── archivo_servicio.py
+│   └── restaurante_servicio.py
+│
 ├── ui/
 │   ├── __init__.py
-│   ├── login_view.py        ← Pantalla de inicio de sesión
-│   └── main_view.py         ← Ventana principal (Usuarios, Productos, Ventas)
-├── assets/                  ← Íconos PNG y logo del sistema
-│   ├── logo.png
-│   ├── ico_usuarios.png
-│   ├── ico_productos.png
-│   ├── ico_ventas.png
-│   └── ico_login.png
-├── main.py                  ← Punto de entrada
+│   ├── login_view.py
+│   └── main_view.py
+│
+├── main.py
+│
 └── README.md
 ```
 
 ---
 
-## Requisitos
+# Organización del proyecto
 
-- Python 3.10 o superior
-- Pillow (para generación de íconos):  
-  ```bash
-  pip install pillow
-  ```
-- Tkinter (incluido en la instalación estándar de Python)
+## datos/
+
+Contiene los archivos JSON utilizados para almacenar la información de la aplicación.
+
+- productos.json
+- usuarios.json
+- ventas.json
 
 ---
 
-## Instalación y ejecución
+## modelos/
+
+Representa las entidades principales del sistema.
+
+### Producto
+
+Representa cada producto disponible en el restaurante.
+
+Contiene:
+
+- código
+- nombre
+- categoría
+- precio
+- stock
+
+### Usuario
+
+Representa los usuarios registrados en el sistema.
+
+Contiene:
+
+- identificación
+- nombre
+- correo electrónico
+
+### Venta
+
+Representa una venta realizada dentro del restaurante.
+
+Contiene:
+
+- usuario
+- producto
+- fecha
+
+---
+
+## servicios/
+
+Contiene la lógica de negocio de la aplicación.
+
+### ArchivoServicio
+
+Se encarga de:
+
+- Leer archivos JSON.
+- Convertir la información en objetos.
+- Guardar productos.
+- Guardar ventas.
+
+### RestauranteServicio
+
+Administra todas las operaciones del sistema.
+
+Entre ellas:
+
+- Validar inicio de sesión.
+- Obtener productos.
+- Obtener usuarios.
+- Registrar productos.
+- Buscar productos.
+- Actualizar productos.
+- Eliminar productos.
+- Registrar ventas.
+- Obtener ventas.
+
+Toda la lógica del negocio permanece en esta capa, evitando que la interfaz manipule directamente los archivos JSON.
+
+---
+
+## ui/
+
+Contiene todas las ventanas desarrolladas con Tkinter.
+
+### LoginView
+
+Permite:
+
+- ingresar usuario
+- ingresar contraseña
+- validar credenciales
+- acceder al sistema
+
+### MainView
+
+Integra toda la funcionalidad principal del restaurante.
+
+Permite:
+
+### Gestión de productos
+
+- Registrar productos.
+- Buscar productos.
+- Actualizar productos.
+- Eliminar productos.
+
+### Consulta de usuarios
+
+Visualiza los usuarios registrados mediante un Listbox.
+
+### Gestión de ventas
+
+Permite:
+
+- seleccionar un usuario
+- seleccionar un producto
+- registrar una venta mediante un botón
+- mostrar las ventas registradas en un Treeview
+
+La interacción se realiza mediante **command=**, ejecutando un callback que solicita la operación al servicio correspondiente.
+
+---
+
+# Manejo de eventos
+
+La aplicación implementa el fundamento principal trabajado durante la Semana 15.
+
+```
+Usuario
+
+↓
+
+Botón
+
+↓
+
+command=
+
+↓
+
+Callback
+
+↓
+
+RestauranteServicio
+
+↓
+
+ArchivoServicio
+
+↓
+
+ventas.json
+
+↓
+
+Actualización de la interfaz
+```
+
+De esta manera la interfaz únicamente coordina la interacción con el usuario mientras que la lógica permanece encapsulada dentro del servicio.
+
+---
+
+# Flujo de funcionamiento
+
+```
+Inicio
+
+↓
+
+main.py
+
+↓
+
+Carga de datos
+
+↓
+
+LoginView
+
+↓
+
+Validación de usuario
+
+↓
+
+MainView
+
+↓
+
+Gestión de Productos
+
+↓
+
+Consulta de Usuarios
+
+↓
+
+Registro de Venta
+
+↓
+
+RestauranteServicio
+
+↓
+
+Persistencia en ventas.json
+
+↓
+
+Actualización de la tabla de ventas
+
+↓
+
+Cerrar sesión
+```
+
+---
+
+# Funcionalidades implementadas
+
+✔ Inicio de sesión.
+
+✔ Validación de usuario y contraseña.
+
+✔ Interfaz gráfica desarrollada con Tkinter.
+
+✔ Gestión completa de productos.
+
+✔ Consulta de usuarios.
+
+✔ Registro de ventas.
+
+✔ Visualización de ventas.
+
+✔ Persistencia mediante archivos JSON.
+
+✔ Uso de callbacks mediante **command=**.
+
+✔ Separación entre modelos, servicios, datos e interfaz.
+
+✔ Arquitectura modular.
+
+---
+
+# Componentes utilizados
+
+La interfaz utiliza componentes de Tkinter y ttk, entre ellos:
+
+- Frame
+- LabelFrame
+- Label
+- Entry
+- Button
+- Combobox
+- Listbox
+- Treeview
+- Scrollbar
+- MessageBox
+
+Los componentes se organizan mediante los gestores de geometría trabajados durante la asignatura para mantener una interfaz clara y ordenada.
+
+---
+
+# Ejecución
+
+Ubicarse dentro del proyecto.
 
 ```bash
-# 1. Clonar o descomprimir el proyecto
-# 2. (Opcional) Regenerar los íconos si no existen
-python assets/generar_assets.py
+cd restaurante_app
+```
 
-# 3. Iniciar la aplicación
+Ejecutar:
+
+```bash
 python main.py
 ```
 
-**Credenciales de demo:**
+---
 
-| Usuario  | Contraseña | Rol            |
-|----------|------------|----------------|
-| admin    | admin123   | administrador  |
-| mlopez   | maria123   | mesero         |
-| cperez   | carlos123  | mesero         |
-| atorres  | ana123     | cajero         |
+# Requisitos
+
+- Python 3.10 o superior
+- Tkinter (incluido en Python)
+- Archivos JSON del proyecto
 
 ---
 
-## Funcionalidades
+# Pruebas realizadas
 
-###  Inicio de sesión
-- Validación de credenciales mediante `RestauranteServicio`
-- Interfaz estilizada con logo y respuesta visual de errores
+Se verificó el siguiente funcionamiento:
 
-###  Usuarios
-- Consulta de usuarios registrados en tabla Treeview
-- Registro de nuevos usuarios con rol asignado
-- Persistencia automática en `usuarios.json`
-
-###  Productos
-- Gestión completa del menú: agregar, eliminar, cambiar disponibilidad
-- Filtrado de productos disponibles para la sección de ventas
-- Persistencia en `productos.json`
-
-###  Ventas *(nuevo — Semana 15)*
-- Selección de usuario atendedor y producto del menú
-- Campo de cantidad con control Spinbox
-- Botón **Registrar venta** conectado mediante `command=` al callback `_callback_registrar_venta`
-- El callback delega la operación a `RestauranteServicio.registrar_venta()`
-- Persistencia inmediata en `ventas.json`
-- Actualización automática del Treeview de historial
-- Resumen de totales recaudados
-- Respuesta visual al usuario (mensaje de éxito/error)
+1. Inicio correcto de la aplicación.
+2. Validación del inicio de sesión.
+3. Visualización de productos.
+4. Visualización de usuarios.
+5. Registro de productos.
+6. Búsqueda de productos.
+7. Actualización de productos.
+8. Eliminación de productos.
+9. Selección de usuario.
+10. Selección de producto.
+11. Registro de ventas.
+12. Persistencia en ventas.json.
+13. Recuperación de ventas al reiniciar la aplicación.
+14. Funcionamiento correcto de los callbacks mediante command=.
 
 ---
 
-## Flujo de manejo de eventos (Semana 15)
+# Tecnologías utilizadas
 
-```
-USUARIO
-   ↓
-presiona "Registrar venta"
-   ↓
-BOTÓN (command=_callback_registrar_venta)
-   ↓
-CALLBACK: obtiene selecciones de la interfaz
-   ↓
-RestauranteServicio.registrar_venta(usuario_id, producto_id, cantidad)
-   ↓
-Validaciones (usuario existe, producto disponible, cantidad > 0)
-   ↓
-ArchivoServicio.escribir("ventas.json", ...)  ← PERSISTENCIA
-   ↓
-RESPUESTA VISUAL: actualización del Treeview + mensaje de resultado
-```
-
----
-
-## Evolución del proyecto
-
-| Semana | Incorporaciones principales |
-|--------|-----------------------------|
-| 10–12  | Modelos base, servicios, LoginView |
-| 13–14  | Secciones Usuarios y Productos, Treeview, gestión del menú |
-| **15** | **Modelo Venta, ventas.json, sección Ventas, manejo de eventos con command= y callback, assets obligatorios** |
-
----
-
-## Notas técnicas
-
-- La lógica de negocio (validaciones, reglas) reside **únicamente** en `RestauranteServicio`.
-- La interfaz (`main_view.py`) **no** manipula directamente los archivos JSON.
-- Los callbacks obtienen datos de los componentes de la UI y los pasan al servicio.
-- Los íconos se generan con Pillow mediante `assets/generar_assets.py`.
+- Python
+- Programación Orientada a Objetos
+- Tkinter
+- ttk
+- JSON
+- Git
+- GitHub
