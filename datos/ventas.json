@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "usuario_id": 2,
+    "usuario_nombre": "María López",
+    "producto_id": 3,
+    "producto_nombre": "Ceviche de Camarón",
+    "precio_unitario": 6.5,
+    "cantidad": 2,
+    "total": 13.0,
+    "fecha": "2026-09-27 13:28:54"
+  }
+]

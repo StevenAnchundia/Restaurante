@@ -1,0 +1,6 @@
+[
+  {"id": 1, "nombre": "Admin", "usuario": "admin", "contrasena": "admin123", "rol": "administrador"},
+  {"id": 2, "nombre": "María López", "usuario": "mlopez", "contrasena": "maria123", "rol": "mesero"},
+  {"id": 3, "nombre": "Carlos Pérez", "usuario": "cperez", "contrasena": "carlos123", "rol": "mesero"},
+  {"id": 4, "nombre": "Ana Torres", "usuario": "atorres", "contrasena": "ana123", "rol": "cajero"}
+]
