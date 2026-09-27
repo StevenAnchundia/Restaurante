@@ -146,7 +146,7 @@ class MainView(tk.Toplevel):
 
         # Info usuario en barra top
         tk.Label(self.barra_top,
-                 text=f"👤  {self.usuario_actual.nombre}  •  {self.usuario_actual.rol}",
+                 text=f"  {self.usuario_actual.nombre}  •  {self.usuario_actual.rol}",
                  font=("Segoe UI", 9),
                  bg=self.COLORES["panel"],
                  fg=self.COLORES["texto_suave"]).pack(side="right", padx=20, pady=10)
@@ -209,9 +209,9 @@ class MainView(tk.Toplevel):
 
         # Botones navegación
         secciones = [
-            ("🧾", "Ventas",    "ventas",    self.COLORES["acento3"]),
-            ("🍳", "Productos", "productos", self.COLORES["acento"]),
-            ("👥", "Usuarios",  "usuarios",  self.COLORES["boton_azul"]),
+            (" ", "Ventas",    "ventas",    self.COLORES["acento3"]),
+            (" ", "Productos", "productos", self.COLORES["acento"]),
+            (" ", "Usuarios",  "usuarios",  self.COLORES["boton_azul"]),
         ]
         self._botones_nav = {}
         for emoji, etiqueta, seccion, color in secciones:
@@ -318,9 +318,9 @@ class MainView(tk.Toplevel):
             w.destroy()
         self._resaltar_nav(seccion)
         titulos = {
-            "ventas": "🧾  Registro de Ventas",
-            "productos": "🍳  Gestión de Productos",
-            "usuarios": "👥  Usuarios del Sistema"
+            "ventas": "  Registro de Ventas",
+            "productos": "  Gestión de Productos",
+            "usuarios": "  Usuarios del Sistema"
         }
         self.lbl_seccion_top.config(text=titulos.get(seccion, ""))
         if seccion == "ventas":
@@ -494,7 +494,7 @@ class MainView(tk.Toplevel):
         self.spin_cantidad.pack(side="left", ipady=5, padx=(0, 20))
 
         self._boton_accion(
-            fila_bot, "🧾  Registrar venta",
+            fila_bot, "  Registrar venta",
             self.COLORES["acento"],
             self._callback_registrar_venta
         ).pack(side="left", fill="x", expand=True, padx=(0, 5))
@@ -588,7 +588,7 @@ class MainView(tk.Toplevel):
 
         fila_btn = tk.Frame(form, bg=self.COLORES["panel"])
         fila_btn.pack(fill="x", pady=(10, 0))
-        self._boton_accion(fila_btn, "➕  Agregar",
+        self._boton_accion(fila_btn, "  Agregar",
                            self.COLORES["acento"],
                            self._cb_agregar_producto).pack(side="left", padx=(0, 8))
 
@@ -681,7 +681,7 @@ class MainView(tk.Toplevel):
 
         fila_btn = tk.Frame(form, bg=self.COLORES["panel"])
         fila_btn.pack(fill="x", pady=(10, 0))
-        self._boton_accion(fila_btn, "➕  Agregar usuario",
+        self._boton_accion(fila_btn, "  Agregar usuario",
                            self.COLORES["acento"],
                            self._cb_agregar_usuario).pack(side="left")
 
