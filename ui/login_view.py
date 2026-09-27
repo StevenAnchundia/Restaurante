@@ -39,7 +39,7 @@ class LoginView(tk.Tk):
             tk.Label(marco_logo, image=self._img_logo,
                      bg=self.COLORES["fondo"]).pack()
         except Exception:
-            tk.Label(marco_logo, text="🍽", font=("Arial", 40),
+            tk.Label(marco_logo, text=" ", font=("Arial", 40),
                      bg=self.COLORES["fondo"],
                      fg=self.COLORES["acento"]).pack()
 
