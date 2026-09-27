@@ -1,4 +1,4 @@
-# 🍽 restaurante_app
+# RESTAURANTE_APP
 
 Sistema de Gestión de Ventas para Restaurante  
 **Asignatura:** Programación Orientada a Objetos  
