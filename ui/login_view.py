@@ -138,7 +138,7 @@ class LoginView(tk.Tk):
         contrasena_texto = self.entrada_contrasena.get().strip()
 
         if not usuario_texto or not contrasena_texto:
-            self.lbl_error.config(text="⚠  Complete usuario y contraseña.")
+            self.lbl_error.config(text="  Complete usuario y contraseña.")
             return
 
         usuario = self.servicio.autenticar(usuario_texto, contrasena_texto)
