@@ -80,21 +80,21 @@ python main.py
 
 ## Funcionalidades
 
-### 🔑 Inicio de sesión
+###  Inicio de sesión
 - Validación de credenciales mediante `RestauranteServicio`
 - Interfaz estilizada con logo y respuesta visual de errores
 
-### 👥 Usuarios
+###  Usuarios
 - Consulta de usuarios registrados en tabla Treeview
 - Registro de nuevos usuarios con rol asignado
 - Persistencia automática en `usuarios.json`
 
-### 🍳 Productos
+###  Productos
 - Gestión completa del menú: agregar, eliminar, cambiar disponibilidad
 - Filtrado de productos disponibles para la sección de ventas
 - Persistencia en `productos.json`
 
-### 🧾 Ventas *(nuevo — Semana 15)*
+###  Ventas *(nuevo — Semana 15)*
 - Selección de usuario atendedor y producto del menú
 - Campo de cantidad con control Spinbox
 - Botón **Registrar venta** conectado mediante `command=` al callback `_callback_registrar_venta`
