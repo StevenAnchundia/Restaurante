@@ -9,5 +9,27 @@
     "cantidad": 2,
     "total": 13.0,
     "fecha": "2026-09-27 13:28:54"
+  },
+  {
+    "id": 2,
+    "usuario_id": 3,
+    "usuario_nombre": "Carlos Pérez",
+    "producto_id": 4,
+    "producto_nombre": "Jugo de Naranja",
+    "precio_unitario": 1.5,
+    "cantidad": 2,
+    "total": 3.0,
+    "fecha": "2026-10-03 17:27:45"
+  },
+  {
+    "id": 3,
+    "usuario_id": 4,
+    "usuario_nombre": "Ana Torres",
+    "producto_id": 8,
+    "producto_nombre": "Flan de Coco",
+    "precio_unitario": 2.0,
+    "cantidad": 1,
+    "total": 2.0,
+    "fecha": "2026-10-03 17:27:51"
   }
 ]
