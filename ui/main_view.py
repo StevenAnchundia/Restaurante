@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import os
 
+from modelos import Usuario
+
 
 class MainView(tk.Toplevel):
 
@@ -61,14 +63,16 @@ class MainView(tk.Toplevel):
         self.geometry(f"{ancho}x{alto}+{x}+{y}")
 
     def _cargar_iconos(self):
+        """Carga logo e íconos desde assets/ escalándolos a un tamaño de interfaz."""
         self._iconos = {}
-        for nombre in ["logo", "ico_usuarios", "ico_productos", "ico_ventas"]:
+        lados = {"logo": 96, "ico_usuarios": 26, "ico_productos": 26,
+                 "ico_ventas": 26}
+        for nombre, lado in lados.items():
             ruta = os.path.join(self.ASSETS, f"{nombre}.png")
             try:
                 img = tk.PhotoImage(file=ruta)
-                if nombre == "logo":
-                    img = img.subsample(2, 2)
-                self._iconos[nombre] = img
+                factor = max(1, -(-max(img.width(), img.height()) // lado))
+                self._iconos[nombre] = img.subsample(factor, factor)
             except Exception:
                 self._iconos[nombre] = None
 
@@ -209,12 +213,15 @@ class MainView(tk.Toplevel):
 
         # Botones navegación
         secciones = [
-            (" ", "Ventas",    "ventas",    self.COLORES["acento3"]),
-            (" ", "Productos", "productos", self.COLORES["acento"]),
-            (" ", "Usuarios",  "usuarios",  self.COLORES["boton_azul"]),
+            ("ico_ventas",    "Ventas",    "ventas",    self.COLORES["acento3"]),
+            ("ico_productos", "Productos", "productos", self.COLORES["acento"]),
         ]
+        # Solo el Administrador ve la gestión administrativa de usuarios
+        if self.usuario_actual.es_administrador():
+            secciones.append(("ico_usuarios", "Usuarios", "usuarios",
+                              self.COLORES["boton_azul"]))
         self._botones_nav = {}
-        for emoji, etiqueta, seccion, color in secciones:
+        for icono, etiqueta, seccion, color in secciones:
             marco_btn = tk.Frame(self.sidebar, bg=self.COLORES["sidebar"],
                                  cursor="hand2")
             marco_btn.pack(fill="x", padx=10, pady=3)
@@ -226,7 +233,8 @@ class MainView(tk.Toplevel):
                                      padx=10, pady=10)
             contenido_btn.pack(side="left", fill="x", expand=True)
 
-            tk.Label(contenido_btn, text=f"{emoji}  {etiqueta}",
+            tk.Label(contenido_btn, text=f"  {etiqueta}",
+                     image=self._iconos.get(icono), compound="left",
                      font=("Segoe UI", 11),
                      bg=self.COLORES["sidebar"],
                      fg=self.COLORES["texto_blanco"],
@@ -314,6 +322,12 @@ class MainView(tk.Toplevel):
     # ── Navegación ────────────────────────────────────────────────────────────
 
     def _mostrar_seccion(self, seccion):
+        # Regla de acceso: Usuarios es exclusivo del Administrador
+        if seccion == "usuarios" and not self.usuario_actual.es_administrador():
+            messagebox.showwarning(
+                "Acceso restringido",
+                "Solo el Administrador puede gestionar usuarios.", parent=self)
+            return
         for w in self.contenido.winfo_children():
             w.destroy()
         self._resaltar_nav(seccion)
@@ -465,7 +479,7 @@ class MainView(tk.Toplevel):
         form = self._card("  Nueva venta", area,
                           color_titulo=self.COLORES["acento"])
 
-        usuarios = self.servicio.obtener_usuarios()
+        usuarios = self.servicio.obtener_usuarios_atencion()
         opts_u = [f"{u.id} — {u.nombre} ({u.rol})" for u in usuarios]
         self.combo_usuario_v = self._fila_combo(
             form, "Atendido por:", opts_u)
@@ -663,57 +677,254 @@ class MainView(tk.Toplevel):
                                   tags=(tag,))
 
     # ═════════════════════════════════════════════════════════════════════════
-    # SECCIÓN USUARIOS
+    # SECCIÓN USUARIOS  (Semana 16: eventos con bind())
+    #
+    #   Interacción → evento → bind() → callback(event) → RestauranteServicio
+    #   → persistencia en usuarios.json → actualización visual
+    #
+    #   Eventos enlazados con bind():     <<TreeviewSelect>>, <<ComboboxSelected>>,
+    #                                     <Return>, <Escape>
+    #   Acciones enlazadas con command=:  Registrar, Actualizar, Eliminar, Limpiar
     # ═════════════════════════════════════════════════════════════════════════
 
+    DESCRIPCION_ROL = {
+        Usuario.ROL_EMPLEADO: "Empleado: personal que puede atender ventas.",
+        Usuario.ROL_CLIENTE: "Cliente: usuario del restaurante, no atiende ventas.",
+        Usuario.ROL_ADMINISTRADOR: "Administrador: cuenta de solo lectura en esta pantalla.",
+    }
+
     def _construir_usuarios(self):
+        self._usuario_seleccionado_id = None
+
         area = tk.Frame(self.contenido, bg=self.COLORES["fondo"])
         area.pack(fill="both", expand=True)
+        izquierda = tk.Frame(area, bg=self.COLORES["fondo"])
+        izquierda.pack(side="left", fill="y")
+        derecha = tk.Frame(area, bg=self.COLORES["fondo"])
+        derecha.pack(side="left", fill="both", expand=True)
 
-        form = self._card("  Registrar usuario", area,
+        # ── Formulario ──
+        form = self._card("  Datos del usuario", izquierda,
                           color_titulo=self.COLORES["acento"])
 
-        self.e_nombre_u = self._fila_campo(form, "Nombre completo:")
-        self.e_usuario_u = self._fila_campo(form, "Nombre de usuario:")
-        self.e_contra_u = self._fila_campo(form, "Contraseña:", contrasena=True)
+        self.lbl_modo_u = tk.Label(
+            form, text="", font=("Segoe UI", 9, "bold"), anchor="w",
+            bg=self.COLORES["panel"], fg=self.COLORES["boton_azul"])
+        self.lbl_modo_u.pack(fill="x")
+
+        self.e_nombre_u = self._fila_campo(form, "Nombre completo:", 16)
+        self.e_usuario_u = self._fila_campo(form, "Usuario:", 16)
+        self.e_contra_u = self._fila_campo(form, "Contraseña:", 16,
+                                           contrasena=True)
         self.combo_rol = self._fila_combo(
-            form, "Rol:", ["mesero", "cajero", "administrador"])
+            form, "Rol:", list(Usuario.ROLES_GESTIONABLES), 16)
 
+        self.lbl_info_rol = tk.Label(
+            form, text="", font=("Segoe UI", 9), anchor="w",
+            justify="left", wraplength=330,
+            bg=self.COLORES["panel"], fg=self.COLORES["texto_suave"])
+        self.lbl_info_rol.pack(fill="x", pady=(2, 0))
+
+        # Botones: acciones principales mediante command=
         fila_btn = tk.Frame(form, bg=self.COLORES["panel"])
-        fila_btn.pack(fill="x", pady=(10, 0))
-        self._boton_accion(fila_btn, "  Agregar usuario",
-                           self.COLORES["acento"],
-                           self._cb_agregar_usuario).pack(side="left")
+        fila_btn.pack(fill="x", pady=(12, 0))
+        fila_btn.columnconfigure((0, 1), weight=1, uniform="btn")
+        self.btn_registrar_u = self._boton_accion(
+            fila_btn, "＋  Registrar", self.COLORES["acento"],
+            self._cb_registrar_usuario)
+        self.btn_actualizar_u = self._boton_accion(
+            fila_btn, "✎  Actualizar", self.COLORES["boton_azul"],
+            self._cb_actualizar_usuario)
+        self.btn_eliminar_u = self._boton_accion(
+            fila_btn, "🗑  Eliminar", self.COLORES["boton_rojo"],
+            self._cb_eliminar_usuario)
+        self.btn_limpiar_u = self._boton_accion(
+            fila_btn, "⟲  Limpiar", self.COLORES["boton_naranja"],
+            self._cb_limpiar_usuario)
+        self.btn_registrar_u.grid(row=0, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
+        self.btn_actualizar_u.grid(row=0, column=1, sticky="ew", padx=(4, 0), pady=(0, 6))
+        self.btn_eliminar_u.grid(row=1, column=0, sticky="ew", padx=(0, 4))
+        self.btn_limpiar_u.grid(row=1, column=1, sticky="ew", padx=(4, 0))
 
+        tk.Label(form, text="Atajos:  Enter = Registrar   •   Esc = Limpiar",
+                 font=("Segoe UI", 8), anchor="w",
+                 bg=self.COLORES["panel"],
+                 fg=self.COLORES["texto_suave"]).pack(fill="x", pady=(10, 0))
+
+        self.lbl_resultado_u = tk.Label(
+            form, text="", font=("Segoe UI", 9, "bold"), anchor="w",
+            justify="left", wraplength=330,
+            bg=self.COLORES["panel"], fg=self.COLORES["acento"])
+        self.lbl_resultado_u.pack(fill="x", pady=(6, 0))
+
+        # ── Tabla ──
         tabla_card = self._card_expandible(
-            "  Usuarios registrados", area,
+            "  Usuarios registrados", derecha,
             color_titulo=self.COLORES["texto_suave"])
-
         cols = ("ID", "Nombre", "Usuario", "Rol")
-        self.tree_usu = self._treeview(tabla_card, cols, (45, 220, 160, 130))
-        self._poblar_usuarios()
+        self.tree_usu = self._treeview(tabla_card, cols, (36, 125, 85, 100))
+        self.lbl_total_u = tk.Label(
+            tabla_card, text="", font=("Segoe UI", 9, "bold"),
+            bg=self.COLORES["panel"], fg=self.COLORES["acento2"])
+        self.lbl_total_u.pack(pady=(0, 8))
 
-    def _cb_agregar_usuario(self):
-        nombre = self.e_nombre_u.get().strip()
-        usuario = self.e_usuario_u.get().strip()
-        contra = self.e_contra_u.get().strip()
-        rol = self.combo_rol.get()
-        exito, msg = self.servicio.agregar_usuario(nombre, usuario, contra, rol)
-        if exito:
-            for e in [self.e_nombre_u, self.e_usuario_u, self.e_contra_u]:
-                e.delete(0, tk.END)
+        self._vincular_eventos_usuarios()
+        self._poblar_usuarios()
+        self._cb_limpiar_usuario()
+
+    def _vincular_eventos_usuarios(self):
+        """Asocia los eventos de la sección mediante bind()."""
+        # Selección de fila → carga el usuario en el formulario
+        self.tree_usu.bind("<<TreeviewSelect>>", self._cb_seleccion_usuario)
+        # Cambio de opción en el Combobox de rol
+        self.combo_rol.bind("<<ComboboxSelected>>", self._cb_rol_seleccionado)
+        # Teclado: Enter confirma el registro (campos del formulario)
+        for campo in (self.e_nombre_u, self.e_usuario_u,
+                      self.e_contra_u, self.combo_rol):
+            campo.bind("<Return>", self._cb_tecla_return)
+        # Teclado: Escape limpia formulario y selección (formulario y tabla)
+        for widget in (self.e_nombre_u, self.e_usuario_u, self.e_contra_u,
+                       self.combo_rol, self.tree_usu):
+            widget.bind("<Escape>", self._cb_tecla_escape)
+
+    # ── Callbacks de eventos (bind) ───────────────────────────────────────────
+
+    def _cb_seleccion_usuario(self, event=None):
+        """<<TreeviewSelect>>: obtiene el id de la fila y consulta al servicio."""
+        seleccion = self.tree_usu.selection()
+        if not seleccion:          # la selección se limpió: nada que cargar
+            return
+        usuario_id = int(seleccion[0])      # el iid de la fila es el id del usuario
+        usuario = self.servicio.obtener_usuario_por_id(usuario_id)
+        if usuario is None:
+            self._msg_usuario("⚠  El usuario ya no existe.", error=True)
             self._poblar_usuarios()
-            self._estado(msg)
+            return
+        self._cargar_usuario_en_formulario(usuario)
+
+    def _cb_rol_seleccionado(self, event=None):
+        """<<ComboboxSelected>>: responde al cambio de rol."""
+        self._actualizar_descripcion_rol()
+        self._estado(f"Rol seleccionado: {self.combo_rol.get()}")
+        self.e_nombre_u.focus_set()
+
+    def _cb_tecla_return(self, event=None):
+        """<Return>: atajo que reutiliza el callback del botón Registrar."""
+        self._cb_registrar_usuario()
+        return "break"
+
+    def _cb_tecla_escape(self, event=None):
+        """<Escape>: atajo que reutiliza el callback del botón Limpiar."""
+        self._cb_limpiar_usuario()
+        return "break"
+
+    # ── Callbacks de botones (command=) ───────────────────────────────────────
+
+    def _cb_registrar_usuario(self):
+        datos = self._leer_formulario_usuario()
+        exito, msg = self.servicio.agregar_usuario(
+            datos["nombre"], datos["usuario"], datos["contrasena"],
+            datos["rol"], solicitante_id=self.usuario_actual.id)
+        self._finalizar_accion_usuario(exito, msg)
+
+    def _cb_actualizar_usuario(self):
+        if self._usuario_seleccionado_id is None:
+            self._msg_usuario("⚠  Seleccione un usuario de la tabla.", error=True)
+            return
+        datos = self._leer_formulario_usuario()
+        exito, msg = self.servicio.actualizar_usuario(
+            self._usuario_seleccionado_id, datos["nombre"], datos["usuario"],
+            datos["contrasena"], datos["rol"],
+            solicitante_id=self.usuario_actual.id)
+        self._finalizar_accion_usuario(exito, msg)
+
+    def _cb_eliminar_usuario(self):
+        if self._usuario_seleccionado_id is None:
+            self._msg_usuario("⚠  Seleccione un usuario de la tabla.", error=True)
+            return
+        nombre = self.e_nombre_u.get().strip() or "el usuario seleccionado"
+        if not messagebox.askyesno("Confirmar eliminación",
+                                   f"¿Eliminar a '{nombre}'?", parent=self):
+            return
+        exito, msg = self.servicio.eliminar_usuario(
+            self._usuario_seleccionado_id,
+            solicitante_id=self.usuario_actual.id)
+        self._finalizar_accion_usuario(exito, msg, color_ok=self.COLORES["boton_rojo"])
+
+    def _cb_limpiar_usuario(self):
+        """Devuelve la interfaz a su estado inicial (sin selección)."""
+        self._usuario_seleccionado_id = None
+        for entrada in (self.e_nombre_u, self.e_usuario_u, self.e_contra_u):
+            entrada.delete(0, tk.END)
+        self.combo_rol.current(0)
+        self.tree_usu.selection_remove(self.tree_usu.selection())
+        self.lbl_modo_u.config(text="Modo: nuevo registro")
+        self._actualizar_descripcion_rol()
+        self._actualizar_botones_usuario()
+        self.e_nombre_u.focus_set()
+
+    # ── Métodos auxiliares (reutilizados por varios callbacks) ────────────────
+
+    def _leer_formulario_usuario(self) -> dict:
+        return {
+            "nombre": self.e_nombre_u.get().strip(),
+            "usuario": self.e_usuario_u.get().strip(),
+            "contrasena": self.e_contra_u.get().strip(),
+            "rol": self.combo_rol.get(),
+        }
+
+    def _cargar_usuario_en_formulario(self, usuario):
+        """Muestra el usuario en el formulario. La contraseña nunca se carga."""
+        self._usuario_seleccionado_id = usuario.id
+        self.e_nombre_u.delete(0, tk.END)
+        self.e_nombre_u.insert(0, usuario.nombre)
+        self.e_usuario_u.delete(0, tk.END)
+        self.e_usuario_u.insert(0, usuario.usuario)
+        self.e_contra_u.delete(0, tk.END)
+        self.combo_rol.set(usuario.rol)
+        self.lbl_modo_u.config(
+            text=f"Editando usuario #{usuario.id}  (contraseña vacía = sin cambio)")
+        self._actualizar_descripcion_rol()
+        self._actualizar_botones_usuario()
+
+    def _actualizar_descripcion_rol(self):
+        self.lbl_info_rol.config(
+            text=self.DESCRIPCION_ROL.get(self.combo_rol.get(), ""))
+
+    def _actualizar_botones_usuario(self):
+        """Actualizar/Eliminar solo si hay un Empleado o Cliente seleccionado."""
+        editable = (self._usuario_seleccionado_id is not None
+                    and self.combo_rol.get() in Usuario.ROLES_GESTIONABLES)
+        estado = "normal" if editable else "disabled"
+        self.btn_actualizar_u.config(state=estado)
+        self.btn_eliminar_u.config(state=estado)
+
+    def _finalizar_accion_usuario(self, exito, msg, color_ok=None):
+        """Respuesta visual común a registrar, actualizar y eliminar."""
+        if exito:
+            self._poblar_usuarios()
+            self._cb_limpiar_usuario()
+            self._msg_usuario(f"✓  {msg}", error=False)
+            self._estado(msg, color_ok)
         else:
-            messagebox.showerror("Error", msg, parent=self)
+            self._msg_usuario(f"⚠  {msg}", error=True)
+
+    def _msg_usuario(self, texto, error=False):
+        color = self.COLORES["boton_rojo"] if error else self.COLORES["acento"]
+        self.lbl_resultado_u.config(text=texto, fg=color)
+        self.after(5000, lambda: self.lbl_resultado_u.winfo_exists()
+                   and self.lbl_resultado_u.config(text=""))
 
     def _poblar_usuarios(self):
+        """Llena el Treeview; el iid de cada fila es el id del usuario."""
         self._limpiar(self.tree_usu)
-        for i, u in enumerate(self.servicio.obtener_usuarios()):
+        usuarios = self.servicio.obtener_usuarios()
+        for i, u in enumerate(usuarios):
             tag = "par" if i % 2 == 0 else "impar"
-            self.tree_usu.insert("", "end",
+            self.tree_usu.insert("", "end", iid=str(u.id),
                                  values=(u.id, u.nombre, u.usuario, u.rol),
                                  tags=(tag,))
+        self.lbl_total_u.config(text=f"Total de usuarios: {len(usuarios)}")
 
     # ── Cerrar sesión ─────────────────────────────────────────────────────────
 
